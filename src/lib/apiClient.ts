@@ -1,12 +1,22 @@
 import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 
+// Create a function to logout user
+const logoutUser = () => {
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('refreshToken')
+    // Redirect to login page
+    if (typeof window !== 'undefined') {
+        window.location.href = '/login'
+    }
+}
+
 class ApiClient {
     private instance: AxiosInstance
 
     constructor() {
         this.instance = axios.create({
-            baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+            baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000',
             timeout: 10000,
             headers: {
                 'Content-Type': 'application/json',
@@ -46,9 +56,7 @@ class ApiClient {
                 // Handle error responses
                 if (error.response?.status === 401) {
                     // Handle unauthorized access
-                    localStorage.removeItem('authToken')
-                    // Redirect to login page or show auth error
-                    console.warn('Unauthorized access - redirecting to login')
+                    logoutUser()
                 }
 
                 if (error.response?.status === 500) {

@@ -1,22 +1,29 @@
 import { useQuery } from '@tanstack/react-query'
-import { apiService } from '../services/api'
+import { userService } from '../services/user'
 
 interface User {
-    id: number
-    name: string
-    email: string
+    id: number | string;
+    name: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    role?: 'USER' | 'ADMIN';
+    isActive?: boolean;
+    isVerified?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export const useUsers = () => {
     return useQuery<User[]>({
         queryKey: ['users'],
-        queryFn: () => apiService.getUsers(),
+        queryFn: () => userService.getUsers(),
     })
 }
 
 export const useUser = (id: number) => {
     return useQuery<User>({
         queryKey: ['user', id],
-        queryFn: () => apiService.getUserById(id),
+        queryFn: () => userService.getUserById(id),
     })
 }
