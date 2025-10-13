@@ -9,9 +9,13 @@ import type { UpdateUserDto, User } from "@/types";
 
 interface UserListSectionProps {
   users: User[];
+  onViewDetail?: (userId: string) => void;
 }
 
-export default function UserListSection({ users }: UserListSectionProps) {
+export default function UserListSection({
+  users,
+  onViewDetail,
+}: UserListSectionProps) {
   const queryClient = useQueryClient();
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editForm, setEditForm] = useState<{ name: string; email: string }>({
@@ -135,6 +139,11 @@ export default function UserListSection({ users }: UserListSectionProps) {
                       <p className="text-xs text-gray-400 dark:text-gray-500">
                         ID: {user.id}
                       </p>
+                      {user.isActive === false && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 mt-1">
+                          Locked
+                        </span>
+                      )}
                     </div>
                   </div>
                 )}
@@ -172,6 +181,13 @@ export default function UserListSection({ users }: UserListSectionProps) {
                         onClick={() => startEditing(user)}
                       >
                         Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onViewDetail && onViewDetail(user.id)}
+                      >
+                        View Detail
                       </Button>
                       <Button
                         size="sm"

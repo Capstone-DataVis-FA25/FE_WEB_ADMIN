@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userService } from "../services/user";
 import { Spinner } from "../components/ui/spinner";
@@ -6,9 +7,12 @@ import ProfileSection from "../components/admin/ProfileSection";
 import ChangePasswordSection from "../components/admin/ChangePasswordSection";
 import UserCreationSection from "../components/admin/UserCreationSection";
 import UserListSection from "../components/admin/UserListSection";
+import UserDetailSection from "../components/admin/UserDetailSection";
 import type { User } from "@/types";
 
 export default function AdminUserManagementPage() {
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
   const {
     data: users,
     isLoading: usersLoading,
@@ -88,7 +92,16 @@ export default function AdminUserManagementPage() {
         </div>
         <div className="space-y-6">
           <UserCreationSection />
-          {users && <UserListSection users={users} />}
+          {selectedUserId ? (
+            <UserDetailSection
+              userId={selectedUserId}
+              onBack={() => setSelectedUserId(null)}
+            />
+          ) : (
+            users && (
+              <UserListSection users={users} onViewDetail={setSelectedUserId} />
+            )
+          )}
         </div>
       </div>
     </div>

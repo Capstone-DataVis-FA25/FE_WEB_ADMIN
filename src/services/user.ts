@@ -1,5 +1,5 @@
 import apiClient from '../lib/apiClient'
-import type { User, CreateUserDto, UpdateUserDto, ChangePasswordDto } from '../types'
+import type { User, CreateUserDto, UpdateUserDto, ChangePasswordDto, LockUnlockUserDto } from '../types'
 
 class UserService {
     async getUsers(): Promise<User[]> {
@@ -34,6 +34,10 @@ class UserService {
     async deleteUser(id: number | string): Promise<void> {
         // For delete with email confirmation, we need to send email in body
         return apiClient.delete<void>(`/users/${id}`)
+    }
+
+    async lockUnlockUser(id: number | string, lockUnlockData: LockUnlockUserDto): Promise<User> {
+        return apiClient.patch<User>(`/users/${id}/lock-unlock`, lockUnlockData)
     }
 }
 
