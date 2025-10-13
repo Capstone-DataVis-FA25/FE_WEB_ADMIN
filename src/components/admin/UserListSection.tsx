@@ -46,6 +46,15 @@ export default function UserListSection({
     },
   });
 
+  // Lock/Unlock user mutation
+  const lockUnlockUserMutation = useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      userService.lockUnlockUser(id, { isActive }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+
   const handleUpdateUser = () => {
     if (editingUser) {
       updateUserMutation.mutate({
@@ -59,6 +68,10 @@ export default function UserListSection({
     if (window.confirm("Are you sure you want to delete this user?")) {
       deleteUserMutation.mutate(id);
     }
+  };
+
+  const handleLockUnlockUser = (id: string, isActive: boolean) => {
+    lockUnlockUserMutation.mutate({ id, isActive });
   };
 
   const startEditing = (user: User) => {
@@ -188,6 +201,25 @@ export default function UserListSection({
                         onClick={() => onViewDetail && onViewDetail(user.id)}
                       >
                         View Detail
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={
+                          user.isActive === false ? "default" : "outline"
+                        }
+                        onClick={() =>
+                          handleLockUnlockUser(user.id, !user.isActive)
+                        }
+                        disabled={lockUnlockUserMutation.isPending}
+                      >
+                        {lockUnlockUserMutation.isPending &&
+                        lockUnlockUserMutation.variables?.id === user.id ? (
+                          <Spinner size="sm" />
+                        ) : user.isActive === false ? (
+                          "Unlock"
+                        ) : (
+                          "Lock"
+                        )}
                       </Button>
                       <Button
                         size="sm"
