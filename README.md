@@ -24,6 +24,14 @@ A modern React admin dashboard built with:
 - ✅ Custom hooks for data fetching
 - ✅ Common UI components (Card, Button, Input, Alert, Spinner)
 - ✅ ESLint and Prettier configuration
+- ✅ User management (Admin panel with CRUD operations)
+- ✅ Profile management (View and update profile)
+- ✅ Password management (Change password functionality)
+- ✅ Modern dashboard layout with collapsible sidebar
+- ✅ Authentication system with login/logout
+- ✅ Protected routes that require authentication
+- ✅ User context for managing authentication state
+- ✅ Seed data for development and testing
 
 ## Getting Started
 
@@ -82,13 +90,18 @@ npm run preview
 src/
 ├── components/        # Reusable components
 │   ├── ui/            # Shadcn UI components
-│   └── ...            # Other components
+│   └── admin/         # Admin-specific components
+├── pages/             # Page components
+├── layouts/           # Layout components
 ├── hooks/             # Custom hooks
 ├── lib/               # Utility functions and API client
 ├── services/          # API services
+├── contexts/          # React context providers
 ├── App.tsx            # Main application component
 └── main.tsx           # Application entry point
 ```
+
+For detailed directory structure documentation, see [Directory Structure](docs/directory-structure.md).
 
 ## Available Scripts
 
@@ -107,6 +120,47 @@ src/
 - [TanStack Query](https://tanstack.com/query) - Data fetching and state management
 - [Axios](https://axios-http.com/) - HTTP client
 - [React Router](https://reactrouter.com/) - Routing library
+
+## Authentication System
+
+The application now includes a complete authentication system with the following features:
+
+1. **Login Page**
+
+   - Email and password authentication
+   - Form validation
+   - Error handling
+   - Loading states
+
+2. **Authentication Context**
+
+   - Global state management for authentication
+   - User session persistence
+   - Login and logout functions
+
+3. **Protected Routes**
+
+   - Automatic redirect to login for unauthenticated users
+   - Route protection for admin pages
+
+4. **Automatic Token Management**
+
+   - Automatic injection of authentication tokens in API requests
+   - Automatic logout on 401 responses
+
+5. **User Profile Integration**
+   - Display current user information in the header
+   - Profile section uses real user data instead of mock data
+
+## Layout System
+
+The application features a modern dashboard layout with:
+
+1. **Collapsible Sidebar**: Navigation menu that can be toggled open/closed
+2. **Responsive Header**: Displays current page title and user controls
+3. **Main Content Area**: Dedicated space for page content
+
+For detailed layout documentation, see [Layout System](docs/layout-system.md).
 
 ## Axios Configuration
 
@@ -133,32 +187,39 @@ const newUser = await apiClient.post("/users", {
 });
 ```
 
-## Common Components
+## Admin User Management
 
-The project includes several reusable UI components:
+The application includes a comprehensive admin user management system with the following features:
 
-- **Button** - Styled button with variants
-- **Card** - Container component with header, content, and footer
-- **Input** - Styled input field
-- **Alert** - Notification component with variants
-- **Spinner** - Loading indicator with size and color options
-- **Modal** - Accessible modal dialog component
+1. **User Profile Management**
 
-All components follow the Shadcn UI design pattern and are fully typed.
+   - View current user profile
+   - Edit profile information (name, email)
+
+2. **Password Management**
+
+   - Change password with current password validation
+   - Password confirmation validation
+
+3. **User Administration**
+   - Create new users with name, email, and password
+   - View list of all users
+   - Edit existing user information
+   - Delete users with confirmation
+
+The admin panel is accessible at `/admin/users` route.
+
+For detailed documentation, see [Admin User Management Documentation](docs/admin-user-management.md).
 
 ## Custom Hooks
 
-The project includes several useful custom hooks:
+The project includes several custom hooks for common functionality:
 
-- **useDebounce** - Debounces a value for performance optimization
-- **useLocalStorage** - Manages state in localStorage
-- **useModal** - Manages modal open/close state
-- **useOnClickOutside** - Detects clicks outside of an element
-- **useMediaQuery** - Matches CSS media queries
-- **useToggle** - Manages boolean toggle state
-- **useAsync** - Handles asynchronous operations
-- **useHover** - Detects hover state on elements
-- **useCopyToClipboard** - Copies text to clipboard
+- `useDebounce` - Debounce value changes
+- `useModal` - Modal state management
+- `useLocalStorage` - Local storage management
+- `useToggle` - Boolean toggle state
+- `useMediaQuery` - Media query matching
 
 Example usage:
 
@@ -173,5 +234,14 @@ const debouncedSearchTerm = useDebounce(searchTerm, 500);
 // Modal state management
 const modal = useModal();
 ```
+
+## Seed Data
+
+The application includes seed data for development and testing purposes:
+
+- 1 Admin user (admin@example.com)
+- 2 Regular users (user1@example.com, user2@example.com)
+
+Seed data is located in `src/seed.ts` and can be used to populate the database during development.
 
 ## Axios Configuration
