@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,17 +11,21 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Spinner } from "@/components/ui/spinner";
 
 interface ApiError {
   response?: {
     data?: {
       message?: string;
+      error?: string;
     };
+    status?: number;
   };
 }
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -29,16 +33,35 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    // Clear error when user starts typing
+    if (error) {
+      setError(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Basic validation
+    if (!formData.email || !formData.password) {
+      setError("Please enter both email and password");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -48,7 +71,19 @@ export default function LoginPage() {
     } catch (err: unknown) {
       console.error("Login error:", err);
       const apiError = err as ApiError;
-      setError(apiError.response?.data?.message || "Invalid email or password");
+
+      // Handle different types of errors
+      if (apiError.response?.status === 401) {
+        setError("Invalid email or password");
+      } else if (apiError.response?.status === 400) {
+        setError("Please check your input and try again");
+      } else if (apiError.response?.data?.message) {
+        setError(apiError.response.data.message);
+      } else if (apiError.response?.data?.error) {
+        setError(apiError.response.data.error);
+      } else {
+        setError("An error occurred during login. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -59,7 +94,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
-            Login
+            Admin Login
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -81,6 +116,8 @@ export default function LoginPage() {
                 onChange={handleChange}
                 required
                 placeholder="Enter your email"
+                disabled={loading}
+                className="border-gray-300 dark:border-gray-600"
               />
             </div>
             <div>
@@ -98,18 +135,30 @@ export default function LoginPage() {
                 onChange={handleChange}
                 required
                 placeholder="Enter your password"
+                disabled={loading}
+                className="border-gray-300 dark:border-gray-600"
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? (
+                <>
+                  <Spinner size="sm" className="mr-2" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col items-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-blue-600 hover:underline">
-              Sign up
+            Forgot your password?{" "}
+            <Link
+              to="/forgot-password"
+              className="text-blue-600 hover:underline"
+            >
+              Reset it
             </Link>
           </p>
         </CardFooter>

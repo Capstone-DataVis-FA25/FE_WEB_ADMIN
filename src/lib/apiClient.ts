@@ -13,10 +13,16 @@ const logoutUser = () => {
 
 class ApiClient {
     private instance: AxiosInstance
+    private isRefreshing = false
+    private failedQueue: Array<{
+        resolve: (value?: unknown) => void
+        reject: (reason?: unknown) => void
+    }> = []
 
     constructor() {
+        // Use environment variable for API base URL, fallback to /api for proxy
         this.instance = axios.create({
-            baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000',
+            baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
             timeout: 10000,
             headers: {
                 'Content-Type': 'application/json',
@@ -50,13 +56,59 @@ class ApiClient {
         this.instance.interceptors.response.use(
             (response: AxiosResponse) => {
                 // Handle successful responses
-                return response.data
+                return response.data.data;
             },
-            (error) => {
-                // Handle error responses
-                if (error.response?.status === 401) {
-                    // Handle unauthorized access
-                    logoutUser()
+            async (error) => {
+                const originalRequest = error.config
+
+                // Handle unauthorized access (401)
+                if (error.response?.status === 401 && !originalRequest._retry) {
+                    // If we're already refreshing, queue this request
+                    if (this.isRefreshing) {
+                        return new Promise((resolve, reject) => {
+                            this.failedQueue.push({ resolve, reject })
+                        }).then(token => {
+                            originalRequest.headers['Authorization'] = 'Bearer ' + token
+                            return this.instance(originalRequest)
+                        }).catch(err => {
+                            return Promise.reject(err)
+                        })
+                    }
+
+                    originalRequest._retry = true
+                    this.isRefreshing = true
+
+                    try {
+                        const refreshToken = localStorage.getItem('refreshToken')
+                        if (refreshToken) {
+                            // Try to refresh the token
+                            const response = await axios.post(
+                                `${import.meta.env.VITE_API_BASE_URL || '/api'}/auth/refresh`,
+                                { refreshToken }
+                            )
+
+                            const { access_token } = response.data
+                            localStorage.setItem('authToken', access_token)
+
+                            // Process the queue
+                            this.processQueue(null, access_token)
+
+                            // Retry the original request
+                            originalRequest.headers['Authorization'] = 'Bearer ' + access_token
+                            return this.instance(originalRequest)
+                        } else {
+                            // No refresh token, logout
+                            this.processQueue(new Error('No refresh token'), null)
+                            logoutUser()
+                        }
+                    } catch (refreshError) {
+                        // Refresh failed, logout
+                        this.processQueue(refreshError as Error, null)
+                        logoutUser()
+                        return Promise.reject(refreshError)
+                    } finally {
+                        this.isRefreshing = false
+                    }
                 }
 
                 if (error.response?.status === 500) {
@@ -67,6 +119,18 @@ class ApiClient {
                 return Promise.reject(error)
             }
         )
+    }
+
+    private processQueue(error: Error | null, token: string | null = null) {
+        this.failedQueue.forEach(({ resolve, reject }) => {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(token)
+            }
+        })
+
+        this.failedQueue = []
     }
 
     // GET request

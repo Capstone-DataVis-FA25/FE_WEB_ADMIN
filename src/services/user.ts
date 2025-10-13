@@ -6,7 +6,7 @@ class UserService {
         return apiClient.get<User[]>('/users')
     }
 
-    async getUserById(id: number): Promise<User> {
+    async getUserById(id: number | string): Promise<User> {
         return apiClient.get<User>(`/users/${id}`)
     }
 
@@ -19,7 +19,7 @@ class UserService {
         return apiClient.post<User>('/users', userData)
     }
 
-    async updateUser(id: number, userData: UpdateUserDto): Promise<User> {
+    async updateUser(id: number | string, userData: UpdateUserDto): Promise<User> {
         return apiClient.put<User>(`/users/${id}`, userData)
     }
 
@@ -31,7 +31,7 @@ class UserService {
         return apiClient.patch<void>('/users/me/change-password', passwordData)
     }
 
-    async deleteUser(id: number): Promise<void> {
+    async deleteUser(id: number | string): Promise<void> {
         // For delete with email confirmation, we need to send email in body
         return apiClient.delete<void>(`/users/${id}`)
     }

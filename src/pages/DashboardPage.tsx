@@ -53,6 +53,7 @@ export default function DashboardPage() {
 
   // Calculate dashboard statistics
   const totalUsers = users?.length || 0;
+  console.log("user array: ", users);
   const recentUsers = users?.slice(0, 5) || [];
 
   return (
@@ -246,7 +247,7 @@ export default function DashboardPage() {
                   >
                     <div className="flex items-center space-x-4">
                       <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-semibold">
-                        {user.name.charAt(0).toUpperCase()}
+                        {user.name ? user.name.charAt(0).toUpperCase() : ''}
                       </div>
                       <div>
                         <h3 className="font-medium text-gray-900 dark:text-white">

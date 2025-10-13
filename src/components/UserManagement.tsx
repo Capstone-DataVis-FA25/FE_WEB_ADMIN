@@ -21,14 +21,16 @@ export default function UserManagement() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editForm, setEditForm] = useState({ name: "", email: "" });
 
-  // Fetch users
+  // Fetch users with proper caching
   const {
-    data: users,
+    data: users = [],
     isLoading,
     error,
   } = useQuery<User[]>({
     queryKey: ["users"],
     queryFn: () => userService.getUsers(),
+    staleTime: 30000, // Cache for 30 seconds
+    gcTime: 300000, // Cache for 5 minutes
   });
 
   // Create user mutation
@@ -42,8 +44,13 @@ export default function UserManagement() {
 
   // Update user mutation
   const updateUserMutation = useMutation({
-    mutationFn: ({ id, userData }: { id: number; userData: Partial<User> }) =>
-      userService.updateUser(id, userData),
+    mutationFn: ({
+      id,
+      userData,
+    }: {
+      id: number | string;
+      userData: Partial<User>;
+    }) => userService.updateUser(id, userData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       setEditingUser(null);
@@ -52,7 +59,7 @@ export default function UserManagement() {
 
   // Delete user mutation
   const deleteUserMutation = useMutation({
-    mutationFn: (id: number) => userService.deleteUser(id),
+    mutationFn: (id: number | string) => userService.deleteUser(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
@@ -79,7 +86,7 @@ export default function UserManagement() {
     }
   };
 
-  const handleDeleteUser = (id: number) => {
+  const handleDeleteUser = (id: number | string) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       deleteUserMutation.mutate(id);
     }
@@ -87,7 +94,10 @@ export default function UserManagement() {
 
   const startEditing = (user: User) => {
     setEditingUser(user);
-    setEditForm({ name: user.name, email: user.email });
+    setEditForm({
+      name: user.name || user.firstName || user.lastName || "",
+      email: user.email || "",
+    });
   };
 
   if (isLoading) {
@@ -292,14 +302,19 @@ export default function UserManagement() {
                     ) : (
                       <div className="flex items-center space-x-3">
                         <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-semibold">
-                          {user.name.charAt(0).toUpperCase()}
+                          {(user.name || user.firstName || user.lastName || "?")
+                            .charAt(0)
+                            .toUpperCase()}
                         </div>
                         <div>
                           <h3 className="font-medium text-gray-900 dark:text-white">
-                            {user.name}
+                            {user.name ||
+                              user.firstName ||
+                              user.lastName ||
+                              "Unnamed User"}
                           </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {user.email}
+                            {user.email || "No email"}
                           </p>
                         </div>
                       </div>

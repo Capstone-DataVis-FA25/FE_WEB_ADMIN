@@ -14,12 +14,20 @@ interface UserListSectionProps {
 export default function UserListSection({ users }: UserListSectionProps) {
   const queryClient = useQueryClient();
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", email: "" });
+  const [editForm, setEditForm] = useState<{ name: string; email: string }>({
+    name: "",
+    email: "",
+  });
 
   // Update user mutation
   const updateUserMutation = useMutation({
-    mutationFn: ({ id, userData }: { id: number; userData: UpdateUserDto }) =>
-      userService.updateUser(id, userData),
+    mutationFn: ({
+      id,
+      userData,
+    }: {
+      id: number | string;
+      userData: UpdateUserDto;
+    }) => userService.updateUser(id, userData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       setEditingUser(null);
@@ -28,7 +36,7 @@ export default function UserListSection({ users }: UserListSectionProps) {
 
   // Delete user mutation
   const deleteUserMutation = useMutation({
-    mutationFn: (id: number) => userService.deleteUser(id),
+    mutationFn: (id: number | string) => userService.deleteUser(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
@@ -43,7 +51,7 @@ export default function UserListSection({ users }: UserListSectionProps) {
     }
   };
 
-  const handleDeleteUser = (id: number) => {
+  const handleDeleteUser = (id: number | string) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       deleteUserMutation.mutate(id);
     }
@@ -51,7 +59,10 @@ export default function UserListSection({ users }: UserListSectionProps) {
 
   const startEditing = (user: User) => {
     setEditingUser(user);
-    setEditForm({ name: user.name, email: user.email });
+    setEditForm({
+      name: user.firstName || user.name || "",
+      email: user.email || "",
+    });
   };
 
   return (
@@ -110,14 +121,16 @@ export default function UserListSection({ users }: UserListSectionProps) {
                 ) : (
                   <div className="flex items-center space-x-3">
                     <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-semibold">
-                      {user.name.charAt(0).toUpperCase()}
+                      {(user.name || user.firstName || "?")
+                        .charAt(0)
+                        .toUpperCase()}
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900 dark:text-white">
-                        {user.name}
+                        {user.name || user.firstName || "Unnamed User"}
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {user.email}
+                        {user.email || "No email provided"}
                       </p>
                       <p className="text-xs text-gray-400 dark:text-gray-500">
                         ID: {user.id}

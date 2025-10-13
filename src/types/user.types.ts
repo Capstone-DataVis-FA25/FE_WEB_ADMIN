@@ -1,14 +1,17 @@
 export interface User {
-    id: number | string; // Support both number and string for flexibility
-    name: string;
+    id: string;
     email: string;
     firstName?: string;
     lastName?: string;
     role?: 'USER' | 'ADMIN';
     isActive?: boolean;
     isVerified?: boolean;
-    createdAt?: string; // Date as string
-    updatedAt?: string; // Date as string
+    createdAt?: string;
+    updatedAt?: string;
+    currentHashedRefreshToken?: string;
+    currentVerifyToken?: string | null;
+    isSocialAccount?: boolean;
+    name?: string;
 }
 
 export interface CreateUserDto {
@@ -28,6 +31,6 @@ export interface ChangePasswordDto {
 }
 
 export interface AuthUser {
-    userId: number | string;
+    userId: string;
     email: string;
 }

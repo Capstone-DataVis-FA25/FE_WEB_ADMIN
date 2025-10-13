@@ -21,7 +21,7 @@ export const useUsers = () => {
     })
 }
 
-export const useUser = (id: number) => {
+export const useUser = (id: number | string) => {
     return useQuery<User>({
         queryKey: ['user', id],
         queryFn: () => userService.getUserById(id),
