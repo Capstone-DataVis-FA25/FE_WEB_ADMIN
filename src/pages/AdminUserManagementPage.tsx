@@ -1,27 +1,12 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userService } from "../services/user";
 import { Spinner } from "../components/ui/spinner";
 import { Alert, AlertTitle, AlertDescription } from "../components/ui/alert";
 import ProfileSection from "../components/admin/ProfileSection";
 import ChangePasswordSection from "../components/admin/ChangePasswordSection";
-import UserCreationSection from "../components/admin/UserCreationSection";
-import UserListSection from "../components/admin/UserListSection";
-import UserDetailSection from "../components/admin/UserDetailSection";
 import type { User } from "@/types";
 
 export default function AdminUserManagementPage() {
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-
-  const {
-    data: users,
-    isLoading: usersLoading,
-    error: usersError,
-  } = useQuery<User[]>({
-    queryKey: ["users"],
-    queryFn: () => userService.getUsers(),
-  });
-
   const {
     data: currentUser,
     isLoading: currentUserLoading,
@@ -31,7 +16,7 @@ export default function AdminUserManagementPage() {
     queryFn: () => userService.getProfile(),
   });
 
-  if (usersLoading || currentUserLoading) {
+  if (currentUserLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <Spinner size="lg" />
@@ -39,7 +24,7 @@ export default function AdminUserManagementPage() {
     );
   }
 
-  if (usersError || currentUserError) {
+  if (currentUserError) {
     return (
       <Alert variant="destructive">
         <AlertTitle>Error</AlertTitle>
@@ -51,24 +36,24 @@ export default function AdminUserManagementPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="space-y-6 p-4 md:p-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-card text-card-foreground rounded-xl shadow-sm p-6 border">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl md:text-3xl font-bold">
             Admin User Management
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-muted-foreground mt-1">
             Manage admin users and your profile
           </p>
         </div>
         <div className="flex space-x-2">
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="inline-flex items-center px-4 py-2 border rounded-lg text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors duration-150"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-1"
+              className="h-4 w-4 mr-2"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -85,23 +70,10 @@ export default function AdminUserManagementPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <div className="space-y-6">
           {currentUser && <ProfileSection currentUser={currentUser} />}
           <ChangePasswordSection />
-        </div>
-        <div className="space-y-6">
-          <UserCreationSection />
-          {selectedUserId ? (
-            <UserDetailSection
-              userId={selectedUserId}
-              onBack={() => setSelectedUserId(null)}
-            />
-          ) : (
-            users && (
-              <UserListSection users={users} onViewDetail={setSelectedUserId} />
-            )
-          )}
         </div>
       </div>
     </div>

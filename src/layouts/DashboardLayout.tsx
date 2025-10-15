@@ -4,7 +4,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Syringe } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface SidebarItem {
   title: string;
@@ -73,6 +74,11 @@ const sidebarItems: SidebarItem[] = [
       </svg>
     ),
   },
+  {
+    title: "System Status",
+    href: "/admin/system",
+    icon: (<Syringe />)
+  }
 ];
 
 interface DashboardLayoutProps {
@@ -116,20 +122,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-background">
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-white dark:bg-gray-800 shadow-lg transition-all duration-300 ease-in-out flex flex-col",
+          "bg-card text-card-foreground border-r shadow-sm transition-all duration-300 ease-in-out flex flex-col",
           sidebarOpen ? "w-64" : "w-20"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar header */}
-          <div className="flex items-center justify-between p-5 border-b dark:border-gray-700">
+          <div className="flex items-center justify-between p-4 border-b">
             {sidebarOpen && (
-              <h1 className="text-xl font-bold text-gray-800 dark:text-white flex items-center">
-                <span className="bg-blue-600 text-white p-1 rounded mr-2">
+              <h1 className="text-lg font-semibold flex items-center">
+                <span className="bg-primary text-primary-foreground p-1 rounded mr-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -152,7 +158,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="ml-auto rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+              className="ml-auto rounded-full"
             >
               {sidebarOpen ? (
                 <div>
@@ -169,27 +175,29 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Sidebar content */}
           <div className="flex-1 overflow-y-auto py-4">
             <nav>
-              <ul className="space-y-1 px-3">
+              <ul className="space-y-1 px-2">
                 {sidebarItems.map((item) => (
                   <li key={item.href}>
                     <Link
                       to={item.href}
                       className={cn(
-                        "flex items-center rounded-lg px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
+                        "flex items-center rounded-md px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
                         location.pathname === item.href &&
-                          "bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
+                          "bg-accent text-accent-foreground"
                       )}
                     >
                       <span
                         className={cn(
-                          "flex items-center justify-center",
-                          sidebarOpen ? "mr-3" : "mr-0"
+                          "flex items-center justify-center text-muted-foreground",
+                          sidebarOpen ? "mr-3" : "mr-0 mx-auto"
                         )}
                       >
                         {item.icon}
                       </span>
                       {sidebarOpen && (
-                        <span className="font-medium">{item.title}</span>
+                        <span className="font-medium text-sm">
+                          {item.title}
+                        </span>
                       )}
                     </Link>
                   </li>
@@ -200,15 +208,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* Sidebar footer */}
           {sidebarOpen && (
-            <div className="p-4 border-t dark:border-gray-700">
+            <div className="p-4 border-t">
               <div className="flex items-center">
-                <div className="bg-gray-200 dark:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center">
-                  <span className="font-semibold text-gray-700 dark:text-gray-300 text-sm">
+                <div className="bg-muted rounded-full w-8 h-8 flex items-center justify-center">
+                  <span className="font-semibold text-foreground text-sm">
                     {user?.firstName?.charAt(0) || user?.name?.charAt(0) || "A"}
                   </span>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <p className="text-sm font-medium">
                     {user?.firstName && user?.lastName
                       ? `${user.firstName} ${user.lastName}`
                       : user?.name || "Admin User"}
@@ -223,15 +231,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 shadow-sm z-10">
-          <div className="flex items-center justify-between p-4">
+        <header className="bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b z-10">
+          <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
+              <h1 className="text-lg font-semibold">
                 {sidebarItems.find((item) => item.href === location.pathname)
                   ?.title || "Dashboard"}
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-1">
+              <ThemeToggle />
               <Button
                 variant="ghost"
                 size="icon"
@@ -262,8 +271,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   className="rounded-full"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                 >
-                  <div className="bg-gray-200 dark:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center">
-                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  <div className="bg-muted rounded-full w-8 h-8 flex items-center justify-center">
+                    <span className="font-semibold">
                       {user?.firstName?.charAt(0) ||
                         user?.name?.charAt(0) ||
                         "A"}
@@ -272,9 +281,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border dark:border-gray-700">
+                  <div className="absolute right-0 mt-2 w-48 bg-popover text-popover-foreground rounded-md shadow-md py-1 z-50 border">
                     <button
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="block w-full text-left px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
                       onClick={() => {
                         handleLogout();
                         setUserMenuOpen(false);
@@ -290,8 +299,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
-          <div className="mx-auto max-w-7xl">{children}</div>
+        <main className="flex-1 overflow-y-auto p-6 bg-background">
+          <div className="mx-auto max-w-7xl space-y-4">{children}</div>
         </main>
       </div>
     </div>

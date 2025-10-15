@@ -30,6 +30,10 @@ export interface ChangePasswordDto {
     newPassword: string;
 }
 
+export interface LockUnlockUserDto {
+    isActive: boolean;
+}
+
 export interface AuthUser {
     userId: string;
     email: string;

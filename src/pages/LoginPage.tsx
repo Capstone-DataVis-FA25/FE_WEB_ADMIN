@@ -90,7 +90,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
@@ -117,7 +117,7 @@ export default function LoginPage() {
                 required
                 placeholder="Enter your email"
                 disabled={loading}
-                className="border-gray-300 dark:border-gray-600"
+                className=""
               />
             </div>
             <div>
@@ -136,7 +136,7 @@ export default function LoginPage() {
                 required
                 placeholder="Enter your password"
                 disabled={loading}
-                className="border-gray-300 dark:border-gray-600"
+                className=""
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
@@ -152,11 +152,11 @@ export default function LoginPage() {
           </form>
         </CardContent>
         <CardFooter className="flex flex-col items-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Forgot your password?{" "}
             <Link
               to="/forgot-password"
-              className="text-blue-600 hover:underline"
+              className="text-primary hover:underline"
             >
               Reset it
             </Link>

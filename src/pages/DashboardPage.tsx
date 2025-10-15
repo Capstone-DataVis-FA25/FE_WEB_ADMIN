@@ -61,16 +61,14 @@ export default function DashboardPage() {
       {/* Dashboard Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Dashboard
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">
             Welcome back, {currentUser?.name || "Admin"}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-          <p className="text-sm text-gray-500">Today</p>
-          <p className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="bg-card text-card-foreground rounded-lg p-4 shadow-sm border">
+          <p className="text-sm text-muted-foreground">Today</p>
+          <p className="text-lg font-semibold">
             {new Date().toLocaleDateString("en-US", {
               weekday: "long",
               year: "numeric",
@@ -83,17 +81,15 @@ export default function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-l-4 border-blue-500 hover:shadow-md transition-shadow">
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Users
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                {totalUsers}
-              </p>
+              <p className="text-3xl font-bold">{totalUsers}</p>
               <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -115,9 +111,9 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-green-500 hover:shadow-md transition-shadow">
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               System Status
             </CardTitle>
           </CardHeader>
@@ -145,9 +141,9 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-purple-500 hover:shadow-md transition-shadow">
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Recent Activity
             </CardTitle>
           </CardHeader>
@@ -175,9 +171,9 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-yellow-500 hover:shadow-md transition-shadow">
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Pending Tasks
             </CardTitle>
           </CardHeader>
@@ -218,7 +214,7 @@ export default function DashboardPage() {
           <CardContent>
             {recentUsers.length === 0 ? (
               <div className="text-center py-8">
-                <div className="bg-gray-100 dark:bg-gray-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <div className="bg-muted rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-8 w-8 text-gray-400"
@@ -234,26 +230,22 @@ export default function DashboardPage() {
                     />
                   </svg>
                 </div>
-                <p className="text-gray-500 dark:text-gray-400">
-                  No users found
-                </p>
+                <p className="text-muted-foreground">No users found</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {recentUsers.map((user) => (
                   <div
                     key={user.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/40 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
                       <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-semibold">
-                        {user.name ? user.name.charAt(0).toUpperCase() : ''}
+                        {user.name ? user.name.charAt(0).toUpperCase() : ""}
                       </div>
                       <div>
-                        <h3 className="font-medium text-gray-900 dark:text-white">
-                          {user.name}
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <h3 className="font-medium">{user.name}</h3>
+                        <p className="text-sm text-muted-foreground">
                           {user.email}
                         </p>
                       </div>
@@ -277,7 +269,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 gap-4">
               <Button
                 variant="outline"
-                className="h-24 flex flex-col items-center justify-center space-y-2 hover:bg-blue-50 dark:hover:bg-blue-900/50"
+                className="h-24 flex flex-col items-center justify-center space-y-2 hover:bg-accent/50"
                 onClick={() => (window.location.href = "/users")}
               >
                 <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-full">
@@ -300,7 +292,7 @@ export default function DashboardPage() {
               </Button>
               <Button
                 variant="outline"
-                className="h-24 flex flex-col items-center justify-center space-y-2 hover:bg-green-50 dark:hover:bg-green-900/50"
+                className="h-24 flex flex-col items-center justify-center space-y-2 hover:bg-accent/50"
                 onClick={() => (window.location.href = "/admin/users")}
               >
                 <div className="bg-green-100 dark:bg-green-900 p-2 rounded-full">
@@ -323,7 +315,7 @@ export default function DashboardPage() {
               </Button>
               <Button
                 variant="outline"
-                className="h-24 flex flex-col items-center justify-center space-y-2 hover:bg-purple-50 dark:hover:bg-purple-900/50"
+                className="h-24 flex flex-col items-center justify-center space-y-2 hover:bg-accent/50"
               >
                 <div className="bg-purple-100 dark:bg-purple-900 p-2 rounded-full">
                   <svg
@@ -345,7 +337,7 @@ export default function DashboardPage() {
               </Button>
               <Button
                 variant="outline"
-                className="h-24 flex flex-col items-center justify-center space-y-2 hover:bg-yellow-50 dark:hover:bg-yellow-900/50"
+                className="h-24 flex flex-col items-center justify-center space-y-2 hover:bg-accent/50"
               >
                 <div className="bg-yellow-100 dark:bg-yellow-900 p-2 rounded-full">
                   <svg
