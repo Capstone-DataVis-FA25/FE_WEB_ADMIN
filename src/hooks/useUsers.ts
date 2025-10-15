@@ -1,18 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { userService } from '../services/user'
-
-interface User {
-    id: number | string;
-    name: string;
-    email: string;
-    firstName?: string;
-    lastName?: string;
-    role?: 'USER' | 'ADMIN';
-    isActive?: boolean;
-    isVerified?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
-}
+import type { User } from '@/types'
 
 export const useUsers = () => {
     return useQuery<User[]>({
@@ -21,7 +9,7 @@ export const useUsers = () => {
     })
 }
 
-export const useUser = (id: number | string) => {
+export const useUser = (id: string) => {
     return useQuery<User>({
         queryKey: ['user', id],
         queryFn: () => userService.getUserById(id),

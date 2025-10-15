@@ -88,176 +88,229 @@ export default function UserDetailSection({
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>User Details</CardTitle>
-        <Button variant="outline" onClick={onBack}>
-          Back to Users
-        </Button>
+    <Card className="shadow-lg">
+      <CardHeader className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+            User Details
+          </CardTitle>
+          <Button
+            variant="outline"
+            onClick={onBack}
+            className="w-full sm:w-auto"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Users
+          </Button>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Profile Information
+      <CardContent className="p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Profile Card */}
+          <div className="lg:col-span-1">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+              <div className="text-center">
+                <div className="mx-auto bg-gradient-to-br from-blue-400 to-purple-500 rounded-full w-24 h-24 flex items-center justify-center text-white font-semibold text-3xl mb-4">
+                  {(user.name || user.firstName || "?").charAt(0).toUpperCase()}
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                  {user.name || user.firstName || "Unnamed User"}
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">
+                  {user.email}
+                </p>
+
+                <div className="flex flex-wrap justify-center gap-2 mb-6">
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      user.role === "ADMIN"
+                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
+                        : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+                    }`}
+                  >
+                    {user.role || "USER"}
+                  </span>
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      user.isActive
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                    }`}
+                  >
+                    {user.isActive ? "Active" : "Inactive"}
+                  </span>
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      user.isVerified
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                    }`}
+                  >
+                    {user.isVerified ? "Verified" : "Unverified"}
+                  </span>
+                </div>
+
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <p>User ID: {user.id}</p>
+                  <p className="mt-1">
+                    Account Type:{" "}
+                    {user.isSocialAccount
+                      ? "Social Account"
+                      : "Regular Account"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Details Section */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                Personal Information
               </h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4">
-                  <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-full w-16 h-16 flex items-center justify-center text-white font-semibold text-xl">
-                    {(user.name || user.firstName || "?")
-                      .charAt(0)
-                      .toUpperCase()}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      First Name
+                    </p>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {user.firstName || "Not provided"}
+                    </p>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                      {user.name || user.firstName || "Unnamed User"}
-                    </h2>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Email
+                    </p>
+                    <p className="font-medium text-gray-900 dark:text-white break-all">
                       {user.email}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Last Name
+                    </p>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {user.lastName || "Not provided"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Role
+                    </p>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {user.role || "USER"}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Personal Information
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                Account Status
               </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">
-                    First Name
-                  </span>
-                  <span className="font-medium">
-                    {user.firstName || "Not provided"}
-                  </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Account Status
+                    </p>
+                    <p>
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                          user.isActive
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                            : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                        }`}
+                      >
+                        {user.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Email Verification
+                    </p>
+                    <p>
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                          user.isVerified
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                            : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                        }`}
+                      >
+                        {user.isVerified ? "Verified" : "Not Verified"}
+                      </span>
+                    </p>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">
-                    Last Name
-                  </span>
-                  <span className="font-medium">
-                    {user.lastName || "Not provided"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">
-                    Email
-                  </span>
-                  <span className="font-medium">{user.email}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Account Information
-              </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">
-                    User ID
-                  </span>
-                  <span className="font-medium">{user.id}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">Role</span>
-                  <span className="font-medium">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        user.role === "ADMIN"
-                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-                      }`}
-                    >
-                      {user.role || "USER"}
-                    </span>
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">
-                    Account Status
-                  </span>
-                  <span className="font-medium">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        user.isActive
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
-                      }`}
-                    >
-                      {user.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">
-                    Email Verified
-                  </span>
-                  <span className="font-medium">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        user.isVerified
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
-                      }`}
-                    >
-                      {user.isVerified ? "Verified" : "Not Verified"}
-                    </span>
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">
-                    Account Type
-                  </span>
-                  <span className="font-medium">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        user.isSocialAccount
-                          ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
-                          : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100"
-                      }`}
-                    >
-                      {user.isSocialAccount
-                        ? "Social Account"
-                        : "Regular Account"}
-                    </span>
-                  </span>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Account Type
+                    </p>
+                    <p>
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                          user.isSocialAccount
+                            ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100"
+                        }`}
+                      >
+                        {user.isSocialAccount
+                          ? "Social Account"
+                          : "Regular Account"}
+                      </span>
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Created At
+                    </p>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleString()
+                        : "Not available"}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Timestamps
-              </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">
-                    Created At
-                  </span>
-                  <span className="font-medium">
-                    {user.createdAt
-                      ? new Date(user.createdAt).toLocaleDateString()
-                      : "Not available"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">
+            {user.updatedAt && (
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                  Activity
+                </h3>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Last Updated
-                  </span>
-                  <span className="font-medium">
+                  </p>
+                  <p className="font-medium text-gray-900 dark:text-white">
                     {user.updatedAt
-                      ? new Date(user.updatedAt).toLocaleDateString()
+                      ? new Date(user.updatedAt).toLocaleString()
                       : "Not available"}
-                  </span>
+                  </p>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </CardContent>

@@ -5,6 +5,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { SystemStatus } from "./components/SystemStatus";
 
 function App() {
   return (
@@ -22,6 +23,10 @@ function App() {
                   <Route
                     path="/admin/users"
                     element={<AdminUserManagementPage />}
+                  />
+                  <Route
+                    path="/admin/system"
+                    element={<SystemStatus />}
                   />
                 </Routes>
               </DashboardLayout>

@@ -115,13 +115,13 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
                   ? `${currentUser.firstName.charAt(
                       0
                     )}${currentUser.lastName.charAt(0)}`.toUpperCase()
-                  : currentUser.name.charAt(0).toUpperCase()}
+                  : (currentUser.name?.charAt(0) || "?").toUpperCase()}
               </div>
               <div>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   {currentUser.firstName && currentUser.lastName
                     ? `${currentUser.firstName} ${currentUser.lastName}`
-                    : currentUser.name}
+                    : currentUser.name || "Unnamed User"}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
                   {currentUser.email}
@@ -139,7 +139,7 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
                 <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   {currentUser.firstName && currentUser.lastName
                     ? `${currentUser.firstName} ${currentUser.lastName}`
-                    : currentUser.name}
+                    : currentUser.name || "—"}
                 </div>
               </div>
               <div>
