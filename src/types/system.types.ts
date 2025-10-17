@@ -36,3 +36,11 @@ export interface SystemStatus {
         database: HealthCheck;
     };
 }
+
+export interface Activity {
+  id: string;
+  createdAt: string;
+  action: string;
+  resource: string;
+  metadata: Record<string, unknown>;
+}
