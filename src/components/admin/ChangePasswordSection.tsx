@@ -11,6 +11,7 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
+import { Key } from "lucide-react";
 import type { ChangePasswordDto } from "@/types";
 
 export default function ChangePasswordSection() {
@@ -67,64 +68,63 @@ export default function ChangePasswordSection() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Change Password</CardTitle>
+    <Card className="rounded-xl border shadow-sm">
+      <CardHeader className="border-b pb-4">
+        <CardTitle className="text-lg font-semibold">Change Password</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-            Current Password
-          </label>
-          <Input
-            type="password"
-            value={changePasswordForm.currentPassword}
-            onChange={(e) =>
-              setChangePasswordForm({
-                ...changePasswordForm,
-                currentPassword: e.target.value,
-              })
-            }
-            placeholder="Enter current password"
-            className="border-gray-300 dark:border-gray-600"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-            New Password
-          </label>
-          <Input
-            type="password"
-            value={changePasswordForm.newPassword}
-            onChange={(e) =>
-              setChangePasswordForm({
-                ...changePasswordForm,
-                newPassword: e.target.value,
-              })
-            }
-            placeholder="Enter new password"
-            className="border-gray-300 dark:border-gray-600"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-            Confirm New Password
-          </label>
-          <Input
-            type="password"
-            value={changePasswordForm.confirmNewPassword}
-            onChange={(e) =>
-              setChangePasswordForm({
-                ...changePasswordForm,
-                confirmNewPassword: e.target.value,
-              })
-            }
-            placeholder="Confirm new password"
-            className="border-gray-300 dark:border-gray-600"
-          />
+      <CardContent className="space-y-5 py-5">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+              Current Password
+            </label>
+            <Input
+              type="password"
+              value={changePasswordForm.currentPassword}
+              onChange={(e) =>
+                setChangePasswordForm({
+                  ...changePasswordForm,
+                  currentPassword: e.target.value,
+                })
+              }
+              placeholder="Enter current password"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+              New Password
+            </label>
+            <Input
+              type="password"
+              value={changePasswordForm.newPassword}
+              onChange={(e) =>
+                setChangePasswordForm({
+                  ...changePasswordForm,
+                  newPassword: e.target.value,
+                })
+              }
+              placeholder="Enter new password"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+              Confirm New Password
+            </label>
+            <Input
+              type="password"
+              value={changePasswordForm.confirmNewPassword}
+              onChange={(e) =>
+                setChangePasswordForm({
+                  ...changePasswordForm,
+                  confirmNewPassword: e.target.value,
+                })
+              }
+              placeholder="Confirm new password"
+            />
+          </div>
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="border-t pt-4">
         <Button
           onClick={handleChangePassword}
           disabled={
@@ -142,20 +142,7 @@ export default function ChangePasswordSection() {
             </>
           ) : (
             <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                />
-              </svg>
+              <Key className="h-4 w-4 mr-2" />
               Change Password
             </>
           )}

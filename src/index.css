@@ -200,6 +200,10 @@
     min-height: 100vh;
   }
 
+  button {
+    cursor: pointer;
+  }
+
   /* Apply specific fonts to headings */
   h1,
   h2,

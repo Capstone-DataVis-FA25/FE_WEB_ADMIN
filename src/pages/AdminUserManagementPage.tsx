@@ -4,6 +4,7 @@ import { Spinner } from "../components/ui/spinner";
 import { Alert, AlertTitle, AlertDescription } from "../components/ui/alert";
 import ProfileSection from "../components/admin/ProfileSection";
 import ChangePasswordSection from "../components/admin/ChangePasswordSection";
+import { RefreshCw } from "lucide-react";
 import type { User } from "@/types";
 
 export default function AdminUserManagementPage() {
@@ -26,7 +27,7 @@ export default function AdminUserManagementPage() {
 
   if (currentUserError) {
     return (
-      <Alert variant="destructive">
+      <Alert variant="destructive" className="max-w-2xl mx-auto mt-8">
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>
           Failed to load data. Please try again later.
@@ -49,29 +50,16 @@ export default function AdminUserManagementPage() {
         <div className="flex space-x-2">
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center px-4 py-2 border rounded-lg text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors duration-150"
+            className="inline-flex items-center px-4 py-2 bg-muted hover:bg-accent rounded-lg text-sm font-medium transition-colors duration-200"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
+            <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </button>
         </div>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-        <div className="space-y-6">
+      <div className="grid gap-6 grid-cols-1">
+        <div className="flex flex-col space-y-6">
           {currentUser && <ProfileSection currentUser={currentUser} />}
           <ChangePasswordSection />
         </div>

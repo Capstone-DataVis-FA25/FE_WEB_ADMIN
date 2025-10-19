@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { userService } from "../services/user";
 import { Spinner } from "../components/ui/spinner";
@@ -17,9 +18,12 @@ import {
   TrendingUp as TrendingUpIcon,
   ClipboardList as ClipboardListIcon,
   UsersRound as UsersRoundIcon,
+  Eye,
 } from "lucide-react";
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
+
   // Fetch users for dashboard statistics
   const {
     data: users,
@@ -50,7 +54,7 @@ export default function DashboardPage() {
 
   if (usersError || profileError) {
     return (
-      <Alert variant="destructive">
+      <Alert variant="destructive" className="max-w-2xl mx-auto mt-8">
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>
           Failed to load dashboard data. Please try again later.
@@ -61,11 +65,14 @@ export default function DashboardPage() {
 
   // Calculate dashboard statistics
   const totalUsers = users?.length || 0;
-  console.log("user array: ", users);
   const recentUsers = users?.slice(0, 5) || [];
 
+  const handleViewUser = (id: string) => {
+    navigate(`/users/${id}`);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 md:p-6">
       {/* Dashboard Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -74,8 +81,10 @@ export default function DashboardPage() {
             Welcome back, {currentUser?.name || "Admin"}
           </p>
         </div>
-        <div className="bg-card text-card-foreground rounded-lg p-4 shadow-sm border">
-          <p className="text-sm text-muted-foreground">Today</p>
+        <div className="bg-card text-card-foreground rounded-xl p-4 shadow-sm border">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">
+            Today
+          </p>
           <p className="text-lg font-semibold">
             {new Date().toLocaleDateString("en-US", {
               weekday: "long",
@@ -89,72 +98,89 @@ export default function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Users
-            </CardTitle>
+        <Card className="rounded-xl border shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Users
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                <UsersIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
+            <div className="flex items-baseline">
               <p className="text-3xl font-bold">{totalUsers}</p>
-              <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                <UsersIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
+              <p className="ml-2 text-sm text-muted-foreground">users</p>
             </div>
-            <p className="text-xs text-gray-500 mt-2">Active users in system</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Active in system
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              System Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Card className="rounded-xl border shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <p className="text-3xl font-bold text-green-600">Operational</p>
-              <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full">
-                <CheckCircleIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                System Status
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                <CheckCircleIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">All systems normal</p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline">
+              <p className="text-2xl font-bold text-emerald-600">Operational</p>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              All systems normal
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Recent Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Card className="rounded-xl border shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <p className="text-3xl font-bold text-purple-600">+12%</p>
-              <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-full">
-                <TrendingUpIcon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Recent Activity
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                <TrendingUpIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">From last week</p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline">
+              <p className="text-2xl font-bold text-purple-600">+12%</p>
+              <p className="ml-2 text-sm text-muted-foreground">
+                from last week
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">Growth rate</p>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Tasks
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Card className="rounded-xl border shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <p className="text-3xl font-bold text-yellow-600">3</p>
-              <div className="bg-yellow-100 dark:bg-yellow-900 p-3 rounded-full">
-                <ClipboardListIcon className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Pending Tasks
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">
+                <ClipboardListIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Tasks requiring attention
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline">
+              <p className="text-3xl font-bold text-amber-600">3</p>
+              <p className="ml-2 text-sm text-muted-foreground">tasks</p>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Requiring attention
             </p>
           </CardContent>
         </Card>
@@ -163,15 +189,15 @@ export default function DashboardPage() {
       {/* Recent Users and Activity Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Users Section */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
+        <Card className="lg:col-span-2 rounded-xl border shadow-sm">
+          <CardHeader className="pb-4">
             <CardTitle>Recent Users</CardTitle>
           </CardHeader>
           <CardContent>
             {recentUsers.length === 0 ? (
               <div className="text-center py-8">
                 <div className="bg-muted rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <UsersRoundIcon className="h-8 w-8 text-gray-400" />
+                  <UsersRoundIcon className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <p className="text-muted-foreground">No users found</p>
               </div>
@@ -180,10 +206,10 @@ export default function DashboardPage() {
                 {recentUsers.map((user) => (
                   <div
                     key={user.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/40 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent/30 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
-                      <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-semibold">
+                      <div className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-full w-10 h-10 flex items-center justify-center text-primary font-semibold border-2 border-primary/30">
                         {user.name ? user.name.charAt(0).toUpperCase() : ""}
                       </div>
                       <div>
@@ -194,10 +220,12 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <Button
-                      variant="outline"
+                      variant="default"
                       size="sm"
-                      className="cursor-pointer"
+                      onClick={() => handleViewUser(user.id)}
+                      className="cursor-pointer bg-green-500 hover:bg-green-600 text-white"
                     >
+                      <Eye className="h-4 w-4 mr-1" />
                       View
                     </Button>
                   </div>
@@ -208,14 +236,9 @@ export default function DashboardPage() {
         </Card>
 
         {/* Activity Feed on the right */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Activity Feed</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ActivityFeed showHeader={false} />
-          </CardContent>
-        </Card>
+        <div className="lg:col-span-1">
+          <ActivityFeed showHeader={true} />
+        </div>
       </div>
     </div>
   );

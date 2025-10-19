@@ -13,7 +13,7 @@ export const systemService = {
      * Get activity log
      */
     getActivityLog: async (): Promise<Activity[]> => {
-        const response = await apiClient.get<Activity[]>('admin/activity?page=1&limit=30');
+        const response = await apiClient.get<{ data: Activity[] }>('admin/activity?page=1&limit=30');
         console.log("activity log: ", response);
         return response.data;
     },
