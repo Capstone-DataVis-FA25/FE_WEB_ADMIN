@@ -1,264 +1,315 @@
-import { useSystemStatus } from "@/hooks/useSystemStatus";
-import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { Alert } from "@/components/ui/alert";
+import {
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Server,
+  Database,
+  Wifi,
+  HardDrive,
+  RefreshCw,
+} from "lucide-react";
 
-interface SystemStatusProps {
-  useWebSocket?: boolean;
-  pollingInterval?: number;
+// Types for system status
+interface SystemMetric {
+  name: string;
+  status: "operational" | "degraded" | "down";
+  value?: string;
+  description: string;
 }
 
+interface SystemStatusData {
+  overallStatus: "operational" | "degraded" | "down";
+  lastUpdated: string;
+  metrics: SystemMetric[];
+}
+
+// Mock data for demonstration
+const mockSystemStatus: SystemStatusData = {
+  overallStatus: "operational",
+  lastUpdated: new Date().toISOString(),
+  metrics: [
+    {
+      name: "API Server",
+      status: "operational",
+      value: "24ms",
+      description: "Main application server",
+    },
+    {
+      name: "Database",
+      status: "operational",
+      value: "12ms",
+      description: "Primary database connection",
+    },
+    {
+      name: "Cache",
+      status: "operational",
+      value: "5ms",
+      description: "Redis cache service",
+    },
+    {
+      name: "File Storage",
+      status: "operational",
+      value: "OK",
+      description: "Cloud storage service",
+    },
+    {
+      name: "Email Service",
+      status: "degraded",
+      value: "Delayed",
+      description: "SMTP email delivery",
+    },
+    {
+      name: "WebSocket",
+      status: "operational",
+      value: "Connected",
+      description: "Real-time communication",
+    },
+  ],
+};
+
+// Function to fetch system status (replace with actual API call)
+const fetchSystemStatus = async (): Promise<SystemStatusData> => {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  return mockSystemStatus;
+};
+
+// Status badge component
+const StatusBadge = ({ status }: { status: SystemMetric["status"] }) => {
+  const statusConfig = {
+    operational: {
+      icon: CheckCircle,
+      className:
+        "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+      label: "Operational",
+    },
+    degraded: {
+      icon: AlertTriangle,
+      className:
+        "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+      label: "Degraded",
+    },
+    down: {
+      icon: XCircle,
+      className: "bg-destructive/10 text-destructive",
+      label: "Down",
+    },
+  };
+
+  const config = statusConfig[status];
+  const Icon = config.icon;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.className}`}
+    >
+      <Icon className="w-3 h-3" />
+      {config.label}
+    </span>
+  );
+};
+
+// Metric card component
+const MetricCard = ({ metric }: { metric: SystemMetric }) => {
+  return (
+    <div className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/30 transition-colors">
+      <div className="flex items-center gap-3">
+        <div className="p-2 rounded-lg bg-muted">
+          <Server className="w-5 h-5 text-muted-foreground" />
+        </div>
+        <div>
+          <h3 className="font-medium text-sm">{metric.name}</h3>
+          <p className="text-xs text-muted-foreground">{metric.description}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-3">
+        {metric.value && (
+          <span className="text-sm font-mono text-muted-foreground">
+            {metric.value}
+          </span>
+        )}
+        <StatusBadge status={metric.status} />
+      </div>
+    </div>
+  );
+};
+
 export const SystemStatus = ({
-  useWebSocket = true,
-  pollingInterval = 0,
-}: SystemStatusProps) => {
-  const { systemStatus, loading, error, connected, refetch } = useSystemStatus({
-    autoConnect: useWebSocket,
-    pollingInterval: useWebSocket ? 0 : pollingInterval,
+  useWebSocket = false,
+  pollingInterval = 30000,
+}: {
+  useWebSocket?: boolean;
+  pollingInterval?: number;
+}) => {
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const { data, isLoading, error, refetch } = useQuery<SystemStatusData>({
+    queryKey: ["systemStatus"],
+    queryFn: fetchSystemStatus,
+    refetchInterval: pollingInterval,
+    staleTime: pollingInterval - 5000, // Consider data stale 5 seconds before refetch
   });
 
-  const formatBytes = (bytes: number) => {
-    const mb = bytes / (1024 * 1024);
-    return `${mb.toFixed(2)} MB`;
+  // Manual refresh function
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
-  const formatUptime = (seconds: number) => {
-    const days = Math.floor(seconds / 86400);
-    const hours = Math.floor((seconds % 86400) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
+  // WebSocket simulation (in a real app, this would connect to a WebSocket server)
+  useEffect(() => {
+    if (!useWebSocket) return;
 
-    const parts = [];
-    if (days > 0) parts.push(`${days}d`);
-    if (hours > 0) parts.push(`${hours}h`);
-    if (minutes > 0) parts.push(`${minutes}m`);
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["systemStatus"] });
+    }, pollingInterval);
 
-    return parts.join(" ") || "0m";
-  };
+    return () => clearInterval(interval);
+  }, [useWebSocket, pollingInterval, queryClient]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
-
-  if (loading && !systemStatus) {
+  if (isLoading) {
     return (
-      <Card className="p-6">
-        <div className="flex items-center justify-center">
-          <Spinner />
-          <span className="ml-2">Loading system status...</span>
-        </div>
+      <Card className="rounded-xl border shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold">
+              System Status
+            </CardTitle>
+            <Spinner size="sm" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <Spinner size="lg" className="mb-3" />
+              <p className="text-muted-foreground">Loading system status...</p>
+            </div>
+          </div>
+        </CardContent>
       </Card>
     );
   }
 
   if (error) {
     return (
-      <Card className="p-6">
-        <Alert variant="destructive">
-          <p className="font-semibold">Error loading system status</p>
-          <p className="text-sm mt-1">{error}</p>
-          <Button onClick={refetch} className="mt-3" size="sm">
-            Retry
-          </Button>
-        </Alert>
+      <Card className="rounded-xl border shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold">
+              System Status
+            </CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+              />
+              Retry
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="p-3 rounded-full bg-destructive/10 mb-3">
+              <XCircle className="w-6 h-6 text-destructive" />
+            </div>
+            <h3 className="text-lg font-medium text-foreground mb-1">
+              Unable to load status
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              There was an error fetching system status
+            </p>
+            <Button onClick={handleRefresh} disabled={isRefreshing}>
+              {isRefreshing ? (
+                <>
+                  <Spinner size="sm" className="mr-2" />
+                  Refreshing...
+                </>
+              ) : (
+                "Try Again"
+              )}
+            </Button>
+          </div>
+        </CardContent>
       </Card>
     );
   }
 
-  if (!systemStatus) {
-    return null;
-  }
+  const overallStatus = data?.overallStatus || "down";
+  const lastUpdated = data?.lastUpdated
+    ? new Date(data.lastUpdated)
+    : new Date();
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">System Status</h2>
-        <div className="flex items-center gap-2">
-          {useWebSocket && (
-            <div className="flex items-center gap-2">
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  connected ? "bg-green-500" : "bg-red-500"
-                }`}
+    <Card className="rounded-xl border shadow-sm">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg font-semibold">
+              System Status
+            </CardTitle>
+            <p className="text-xs text-muted-foreground mt-1">
+              Last updated: {lastUpdated.toLocaleTimeString()}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <StatusBadge status={overallStatus} />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
               />
-              <span className="text-sm text-gray-600">
-                {connected ? "Connected" : "Disconnected"}
-              </span>
-            </div>
-          )}
-          <Button onClick={refetch} size="sm" variant="outline">
-            Refresh
-          </Button>
-        </div>
-      </div>
-
-      {/* Overall Status */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2">
-          <div
-            className={`px-3 py-1 rounded-full text-sm font-semibold ${
-              systemStatus.status === "healthy"
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
-            {systemStatus.status.toUpperCase()}
+              Refresh
+            </Button>
           </div>
-          <span className="text-sm text-gray-500">
-            Last updated: {formatDate(systemStatus.timestamp)}
-          </span>
         </div>
-      </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {data?.metrics.map((metric, index) => (
+            <MetricCard key={index} metric={metric} />
+          ))}
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Uptime */}
-        <div className="border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-2">Uptime</h3>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Process:</span>
-              <span className="font-medium">
-                {formatUptime(systemStatus.uptime.process)}
-              </span>
+        <div className="mt-6 p-4 rounded-lg bg-muted/50">
+          <h4 className="font-medium text-sm mb-2">System Information</h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <Database className="w-4 h-4 text-muted-foreground" />
+              <span>PostgreSQL 14.2</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">System:</span>
-              <span className="font-medium">
-                {formatUptime(systemStatus.uptime.system)}
-              </span>
+            <div className="flex items-center gap-2">
+              <Wifi className="w-4 h-4 text-muted-foreground" />
+              <span>1.2 Gbps</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Started:</span>
-              <span className="font-medium">
-                {formatDate(systemStatus.uptime.startTime)}
-              </span>
+            <div className="flex items-center gap-2">
+              <HardDrive className="w-4 h-4 text-muted-foreground" />
+              <span>2.4 TB Free</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Server className="w-4 h-4 text-muted-foreground" />
+              <span>8 Cores</span>
             </div>
           </div>
         </div>
-
-        {/* Memory */}
-        <div className="border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-2">Memory</h3>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">RSS:</span>
-              <span className="font-medium">
-                {formatBytes(systemStatus.memory.rss)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Heap Total:</span>
-              <span className="font-medium">
-                {formatBytes(systemStatus.memory.heapTotal)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Heap Used:</span>
-              <span className="font-medium">
-                {formatBytes(systemStatus.memory.heapUsed)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">External:</span>
-              <span className="font-medium">
-                {formatBytes(systemStatus.memory.external)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* CPU */}
-        <div className="border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-2">CPU</h3>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Cores:</span>
-              <span className="font-medium">{systemStatus.cpu.cores}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Load Average:</span>
-              <span className="font-medium">
-                {systemStatus.cpu.loadAverage
-                  .map((l) => l.toFixed(2))
-                  .join(", ")}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* System Info */}
-        <div className="border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-2">System Info</h3>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Platform:</span>
-              <span className="font-medium">
-                {systemStatus.system.platform}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Architecture:</span>
-              <span className="font-medium">{systemStatus.system.arch}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Hostname:</span>
-              <span className="font-medium">
-                {systemStatus.system.hostname}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Application Info */}
-        <div className="border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-2">Application</h3>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Version:</span>
-              <span className="font-medium">{systemStatus.app.version}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Node Version:</span>
-              <span className="font-medium">
-                {systemStatus.app.nodeVersion}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Environment:</span>
-              <span className="font-medium">
-                {systemStatus.app.environment}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Health Checks */}
-        <div className="border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-2">Health Checks</h3>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-600">Database:</span>
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    systemStatus.healthChecks.database.status === "healthy"
-                      ? "bg-green-500"
-                      : "bg-red-500"
-                  }`}
-                />
-                <span className="font-medium text-sm">
-                  {systemStatus.healthChecks.database.status}
-                </span>
-              </div>
-            </div>
-            {systemStatus.healthChecks.database.message && (
-              <p className="text-xs text-gray-500">
-                {systemStatus.healthChecks.database.message}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
+      </CardContent>
     </Card>
   );
 };

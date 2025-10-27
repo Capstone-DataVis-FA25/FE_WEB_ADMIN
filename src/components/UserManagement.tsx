@@ -1,15 +1,11 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "./ui/spinner";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import type { User } from "@/types";
 import { userService } from "@/services/user";
-import UserDetailSection from "./admin/UserDetailSection";
 import UserListSection from "./admin/UserListSection";
 
 export default function UserManagement() {
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-
   // Fetch users with proper caching
   const {
     data: users = [],
@@ -43,16 +39,7 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-6">
-      {selectedUserId ? (
-        <UserDetailSection
-          userId={selectedUserId}
-          onBack={() => setSelectedUserId(null)}
-        />
-      ) : (
-        users && (
-          <UserListSection users={users} onViewDetail={setSelectedUserId} />
-        )
-      )}
+      {users && <UserListSection users={users} />}
     </div>
   );
 }

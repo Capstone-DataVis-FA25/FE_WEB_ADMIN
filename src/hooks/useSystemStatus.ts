@@ -112,10 +112,14 @@ export const useSystemStatus = (
     }, [pollingInterval, refetch]);
 
     // Request status update via WebSocket
-    const requestStatus = useCallback(() => {
-        if (socket && connected) {
-            socket.emit('getStatus');
-        }
+    const requestStatus = useCallback((): Promise<void> => {
+        return new Promise((resolve) => {
+            if (socket && connected) {
+                socket.emit('getStatus');
+            }
+            // Resolve immediately as WebSocket emits are async
+            resolve();
+        });
     }, [socket, connected]);
 
     return {

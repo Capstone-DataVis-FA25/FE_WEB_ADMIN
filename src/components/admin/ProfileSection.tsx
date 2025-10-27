@@ -11,6 +11,7 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
+import { Save, Edit } from "lucide-react";
 import type { UpdateUserDto, User } from "@/types";
 
 interface ProfileSectionProps {
@@ -59,58 +60,60 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Your Profile</CardTitle>
+    <Card className="rounded-xl border shadow-sm">
+      <CardHeader className="border-b pb-4">
+        <CardTitle className="text-lg font-semibold">Profile</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5 py-5">
         {isEditing ? (
           <>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                First Name
-              </label>
-              <Input
-                value={profileForm.firstName}
-                onChange={(e) =>
-                  setProfileForm({ ...profileForm, firstName: e.target.value })
-                }
-                placeholder="Enter your first name"
-                className="border-gray-300 dark:border-gray-600"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                Last Name
-              </label>
-              <Input
-                value={profileForm.lastName}
-                onChange={(e) =>
-                  setProfileForm({ ...profileForm, lastName: e.target.value })
-                }
-                placeholder="Enter your last name"
-                className="border-gray-300 dark:border-gray-600"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                Email
-              </label>
-              <Input
-                value={profileForm.email}
-                onChange={(e) =>
-                  setProfileForm({ ...profileForm, email: e.target.value })
-                }
-                placeholder="Enter your email"
-                type="email"
-                className="border-gray-300 dark:border-gray-600"
-              />
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                  First Name
+                </label>
+                <Input
+                  value={profileForm.firstName}
+                  onChange={(e) =>
+                    setProfileForm({
+                      ...profileForm,
+                      firstName: e.target.value,
+                    })
+                  }
+                  placeholder="Enter your first name"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                  Last Name
+                </label>
+                <Input
+                  value={profileForm.lastName}
+                  onChange={(e) =>
+                    setProfileForm({ ...profileForm, lastName: e.target.value })
+                  }
+                  placeholder="Enter your last name"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                  Email
+                </label>
+                <Input
+                  value={profileForm.email}
+                  onChange={(e) =>
+                    setProfileForm({ ...profileForm, email: e.target.value })
+                  }
+                  placeholder="Enter your email"
+                  type="email"
+                />
+              </div>
             </div>
           </>
         ) : (
           <>
-            <div className="flex items-center space-x-4 pb-4 border-b dark:border-gray-700">
-              <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-full w-16 h-16 flex items-center justify-center text-white font-semibold text-xl">
+            <div className="flex items-center space-x-4 pb-4">
+              <div className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-full w-16 h-16 flex items-center justify-center text-primary font-semibold text-xl border-2 border-primary/30">
                 {currentUser.firstName && currentUser.lastName
                   ? `${currentUser.firstName.charAt(
                       0
@@ -118,64 +121,50 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
                   : (currentUser.name?.charAt(0) || "?").toUpperCase()}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-bold text-foreground">
                   {currentUser.firstName && currentUser.lastName
                     ? `${currentUser.firstName} ${currentUser.lastName}`
                     : currentUser.name || "Unnamed User"}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {currentUser.email}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  User ID: {currentUser.id}
-                </p>
+                <p className="text-muted-foreground">{currentUser.email}</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 pt-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-500 dark:text-gray-400">
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
                   Name
                 </label>
-                <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="p-3 bg-muted rounded-lg">
                   {currentUser.firstName && currentUser.lastName
                     ? `${currentUser.firstName} ${currentUser.lastName}`
                     : currentUser.name || "—"}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-500 dark:text-gray-400">
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
                   Email
                 </label>
-                <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="p-3 bg-muted rounded-lg">
                   {currentUser.email}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-500 dark:text-gray-400">
-                  User ID
-                </label>
-                <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  {currentUser.id}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-500 dark:text-gray-400">
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
                   Role
                 </label>
-                <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  Administrator
-                </div>
+                <div className="p-3 bg-muted rounded-lg">Administrator</div>
               </div>
             </div>
           </>
         )}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="border-t pt-4">
         {isEditing ? (
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 w-full">
             <Button
               onClick={handleUpdateProfile}
               disabled={updateProfileMutation.isPending}
+              className="flex-1"
             >
               {updateProfileMutation.isPending ? (
                 <>
@@ -184,20 +173,7 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
                 </>
               ) : (
                 <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
+                  <Save className="h-4 w-4 mr-2" />
                   Save Profile
                 </>
               )}
@@ -207,21 +183,8 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
             </Button>
           </div>
         ) : (
-          <Button onClick={() => setIsEditing(true)}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-              />
-            </svg>
+          <Button onClick={() => setIsEditing(true)} className="w-full">
+            <Edit className="h-4 w-4 mr-2" />
             Edit Profile
           </Button>
         )}

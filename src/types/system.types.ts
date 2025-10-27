@@ -36,3 +36,25 @@ export interface SystemStatus {
         database: HealthCheck;
     };
 }
+
+// Enhanced Activity interface with enriched metadata
+export interface Activity {
+    id: string;
+    createdAt: string;
+    action: string;
+    resource: string;
+    metadata: Record<string, unknown> & {
+        description?: string;
+        actor?: {
+            id: string;
+            name: string;
+            email: string;
+        };
+        targetUser?: {
+            id: string;
+            name: string;
+            email: string;
+            isActive: boolean;
+        };
+    };
+}

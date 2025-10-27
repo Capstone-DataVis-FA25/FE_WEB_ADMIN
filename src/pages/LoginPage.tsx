@@ -90,79 +90,100 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Admin Login
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">
-                Email
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                placeholder="Enter your email"
-                disabled={loading}
-                className=""
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium mb-1"
-              >
-                Password
-              </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                placeholder="Enter your password"
-                disabled={loading}
-                className=""
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
-                <>
-                  <Spinner size="sm" className="mr-2" />
-                  Signing in...
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex flex-col items-center">
-          <p className="text-sm text-muted-foreground">
-            Forgot your password?{" "}
-            <Link
-              to="/forgot-password"
-              className="text-primary hover:underline"
-            >
-              Reset it
-            </Link>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="mx-auto bg-gradient-to-br from-primary/20 to-primary/40 rounded-full w-16 h-16 flex items-center justify-center text-primary font-semibold text-2xl mb-4 border-2 border-primary/30">
+            A
+          </div>
+          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+          <p className="text-muted-foreground mt-1">Sign in to your account</p>
+        </div>
+
+        <Card className="rounded-xl shadow-lg border">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-semibold text-center">
+              Sign In
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-xs text-muted-foreground uppercase tracking-wide mb-2"
+                >
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter your email"
+                  disabled={loading}
+                  className="py-5"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label
+                    htmlFor="password"
+                    className="block text-xs text-muted-foreground uppercase tracking-wide"
+                  >
+                    Password
+                  </label>
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter your password"
+                  disabled={loading}
+                  className="py-5"
+                />
+              </div>
+              <Button type="submit" className="w-full py-5" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Spinner size="sm" className="mr-2" />
+                    Signing in...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-col items-center pt-4 border-t">
+            <p className="text-sm text-muted-foreground">
+              Protected admin area. Unauthorized access is prohibited.
+            </p>
+          </CardFooter>
+        </Card>
+
+        <div className="mt-6 text-center">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Admin Dashboard. All rights reserved.
           </p>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
