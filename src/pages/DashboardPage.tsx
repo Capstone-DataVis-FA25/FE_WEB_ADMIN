@@ -10,21 +10,20 @@ import {
   CardContent,
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import type { User } from "@/types";
-import ActivityFeed from "@/components/admin/ActivityFeed";
 import {
-  Users as UsersIcon,
-  CheckCircle as CheckCircleIcon,
-  TrendingUp as TrendingUpIcon,
-  ClipboardList as ClipboardListIcon,
-  UsersRound as UsersRoundIcon,
+  UsersIcon,
+  CheckCircleIcon,
+  TrendingUpIcon,
+  ClipboardListIcon,
+  UsersRoundIcon,
   Eye,
 } from "lucide-react";
+import type { User } from "@/types/user.types";
+import ActivityFeed from "@/components/admin/ActivityFeed";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
 
-  // Fetch users for dashboard statistics
   const {
     data: users,
     isLoading: usersLoading,
@@ -34,7 +33,6 @@ export default function DashboardPage() {
     queryFn: () => userService.getUsers(),
   });
 
-  // Fetch current user profile
   const {
     data: currentUser,
     isLoading: profileLoading,
@@ -63,7 +61,6 @@ export default function DashboardPage() {
     );
   }
 
-  // Calculate dashboard statistics
   const totalUsers = users?.length || 0;
   const recentUsers = users?.slice(0, 5) || [];
 
@@ -72,149 +69,166 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
-      {/* Dashboard Header */}
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+            Dashboard
+          </h1>
+          <p className="text-muted-foreground mt-2 text-lg">
             Welcome back, {currentUser?.name || "Admin"}
           </p>
         </div>
-        <div className="bg-card text-card-foreground rounded-xl p-4 shadow-sm border">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide">
+        <div className="bg-gradient-to-br from-primary/10 to-accent/10 backdrop-blur-sm text-card-foreground rounded-xl p-5 shadow-lg border border-primary/20 hover:shadow-xl transition-all duration-300">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-2">
             Today
           </p>
-          <p className="text-lg font-semibold">
+          <p className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             {new Date().toLocaleDateString("en-US", {
-              weekday: "long",
+              weekday: "short",
               year: "numeric",
-              month: "long",
+              month: "short",
               day: "numeric",
             })}
           </p>
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="rounded-xl border shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-xl border border-blue-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/10">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
                 Total Users
               </CardTitle>
-              <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                <UsersIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
+                <UsersIcon className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline">
-              <p className="text-3xl font-bold">{totalUsers}</p>
+              <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-400 dark:to-blue-500 bg-clip-text text-transparent">
+                {totalUsers}
+              </p>
               <p className="ml-2 text-sm text-muted-foreground">users</p>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground mt-2 font-medium">
               Active in system
             </p>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-xl border border-emerald-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/20 dark:to-emerald-900/10">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
                 System Status
               </CardTitle>
-              <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-                <CheckCircleIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg">
+                <CheckCircleIcon className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline">
-              <p className="text-2xl font-bold text-emerald-600">Operational</p>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                Operational
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground mt-2 font-medium">
               All systems normal
             </p>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-xl border border-purple-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/20 dark:to-purple-900/10">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
                 Recent Activity
               </CardTitle>
-              <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                <TrendingUpIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg">
+                <TrendingUpIcon className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline">
-              <p className="text-2xl font-bold text-purple-600">+12%</p>
+              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                +12%
+              </p>
               <p className="ml-2 text-sm text-muted-foreground">
                 from last week
               </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">Growth rate</p>
+            <p className="text-xs text-muted-foreground mt-2 font-medium">
+              Growth rate
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-xl border border-amber-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
                 Pending Tasks
               </CardTitle>
-              <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">
-                <ClipboardListIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg">
+                <ClipboardListIcon className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline">
-              <p className="text-3xl font-bold text-amber-600">3</p>
+              <p className="text-4xl font-bold text-amber-600 dark:text-amber-400">
+                3
+              </p>
               <p className="ml-2 text-sm text-muted-foreground">tasks</p>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground mt-2 font-medium">
               Requiring attention
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Users and Activity Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Users Section */}
-        <Card className="lg:col-span-2 rounded-xl border shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle>Recent Users</CardTitle>
+        <Card className="lg:col-span-2 rounded-xl border border-border shadow-lg bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+          <CardHeader className="pb-4 border-b border-border">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-accent">
+                <UsersRoundIcon className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <CardTitle className="text-lg font-bold">Recent Users</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             {recentUsers.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="bg-muted rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <UsersRoundIcon className="h-8 w-8 text-muted-foreground" />
+              <div className="text-center py-12">
+                <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                  <UsersRoundIcon className="h-10 w-10 text-primary" />
                 </div>
-                <p className="text-muted-foreground">No users found</p>
+                <p className="text-muted-foreground font-semibold">
+                  No users found
+                </p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {recentUsers.map((user) => (
                   <div
                     key={user.id}
-                    className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent/30 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-xl border border-border hover:bg-accent/40 transition-all duration-200 hover:shadow-md"
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-full w-10 h-10 flex items-center justify-center text-primary font-semibold border-2 border-primary/30">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-gradient-to-br from-primary to-accent rounded-xl w-12 h-12 flex items-center justify-center text-primary-foreground font-bold shadow-md">
                         {user.name ? user.name.charAt(0).toUpperCase() : ""}
                       </div>
                       <div>
-                        <h3 className="font-medium">{user.name}</h3>
-                        <p className="text-sm text-muted-foreground">
+                        <h3 className="font-semibold text-sm text-foreground">
+                          {user.name}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
                           {user.email}
                         </p>
                       </div>
@@ -223,7 +237,7 @@ export default function DashboardPage() {
                       variant="default"
                       size="sm"
                       onClick={() => handleViewUser(user.id)}
-                      className="cursor-pointer bg-green-500 hover:bg-green-600 text-white"
+                      className="cursor-pointer bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg"
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       View
@@ -235,7 +249,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Activity Feed on the right */}
         <div className="lg:col-span-1">
           <ActivityFeed showHeader={true} />
         </div>
