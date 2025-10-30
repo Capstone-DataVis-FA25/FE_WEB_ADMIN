@@ -24,24 +24,15 @@ export const subscriptionPlansApi = {
 
     // Create a new subscription plan
     createPlan: async (planData: CreateSubscriptionPlanDto): Promise<{ plan: SubscriptionPlan; message: string }> => {
-        return apiClient.post('/subscription-plans', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-            body: planData,
-        });
+        // axios expects (url, data, config). apiClient.post forwards to axios.post.
+        // The auth header is already added by the apiClient interceptor, so just pass planData as the request body.
+        return apiClient.post('/subscription-plans', planData);
     },
 
     // Update an existing subscription plan
     updatePlan: async (id: string, planData: UpdateSubscriptionPlanDto): Promise<{ plan: SubscriptionPlan; message: string }> => {
-        return apiClient.patch(`/subscription-plans/${id}`, {
-            method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-            body: JSON.stringify(planData),
-        });
+        // Pass planData directly so axios sends proper JSON body
+        return apiClient.patch(`/subscription-plans/${id}`, planData);
     },
 
     // Delete a subscription plan
