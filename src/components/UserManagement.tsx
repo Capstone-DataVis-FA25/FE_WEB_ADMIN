@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "./ui/spinner";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
-import type { User } from "@/types";
 import { userService } from "@/services/user";
 import UserListSection from "./admin/UserListSection";
+import type { User } from "@/types/user.types";
 
 export default function UserManagement() {
   // Fetch users with proper caching

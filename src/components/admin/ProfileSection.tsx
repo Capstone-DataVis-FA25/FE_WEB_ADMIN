@@ -11,11 +11,11 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
-import { Save, Edit } from "lucide-react";
-import type { UpdateUserDto, User } from "@/types";
+import { Save, Edit, User } from "lucide-react";
+import type { UpdateUserDto, User as UserType } from "@/types/user.types";
 
 interface ProfileSectionProps {
-  currentUser: User;
+  currentUser: UserType;
 }
 
 export default function ProfileSection({ currentUser }: ProfileSectionProps) {
@@ -27,26 +27,26 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
     email: currentUser.email,
   });
 
-  // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: (userData: UpdateUserDto) =>
       userService.updateProfile(userData),
     onSuccess: (updatedUser) => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      // Update the current user in the users list as well
-      queryClient.setQueryData(["users"], (oldUsers: User[] | undefined) => {
-        if (!oldUsers) return oldUsers;
-        return oldUsers.map((user) =>
-          user.id === updatedUser.id ? updatedUser : user
-        );
-      });
+      queryClient.setQueryData(
+        ["users"],
+        (oldUsers: UserType[] | undefined) => {
+          if (!oldUsers) return oldUsers;
+          return oldUsers.map((user) =>
+            user.id === updatedUser.id ? updatedUser : user
+          );
+        }
+      );
       setIsEditing(false);
     },
   });
 
   const handleUpdateProfile = () => {
     if (profileForm.firstName || profileForm.lastName || profileForm.email) {
-      // Create update data with only the fields that have values
       const updateData: UpdateUserDto = {};
       if (profileForm.firstName || profileForm.lastName) {
         updateData.name =
@@ -60,16 +60,21 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
   };
 
   return (
-    <Card className="rounded-xl border shadow-sm">
-      <CardHeader className="border-b pb-4">
-        <CardTitle className="text-lg font-semibold">Profile</CardTitle>
+    <Card className="rounded-lg border border-border shadow-sm">
+      <CardHeader className="border-b border-border pb-4">
+        <div className="flex items-center gap-2">
+          <User className="w-5 h-5 text-primary" />
+          <CardTitle className="text-base font-semibold">
+            Profile Information
+          </CardTitle>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-5 py-5">
+      <CardContent className="space-y-5 py-6">
         {isEditing ? (
           <>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">
                   First Name
                 </label>
                 <Input
@@ -81,10 +86,11 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
                     })
                   }
                   placeholder="Enter your first name"
+                  className="h-10"
                 />
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">
                   Last Name
                 </label>
                 <Input
@@ -93,10 +99,11 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
                     setProfileForm({ ...profileForm, lastName: e.target.value })
                   }
                   placeholder="Enter your last name"
+                  className="h-10"
                 />
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">
                   Email
                 </label>
                 <Input
@@ -106,6 +113,7 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
                   }
                   placeholder="Enter your email"
                   type="email"
+                  className="h-10"
                 />
               </div>
             </div>
@@ -113,7 +121,7 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
         ) : (
           <>
             <div className="flex items-center space-x-4 pb-4">
-              <div className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-full w-16 h-16 flex items-center justify-center text-primary font-semibold text-xl border-2 border-primary/30">
+              <div className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-lg w-16 h-16 flex items-center justify-center text-primary font-semibold text-xl border border-primary/20">
                 {currentUser.firstName && currentUser.lastName
                   ? `${currentUser.firstName.charAt(
                       0
@@ -121,44 +129,50 @@ export default function ProfileSection({ currentUser }: ProfileSectionProps) {
                   : (currentUser.name?.charAt(0) || "?").toUpperCase()}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground">
+                <h3 className="text-lg font-semibold text-foreground">
                   {currentUser.firstName && currentUser.lastName
                     ? `${currentUser.firstName} ${currentUser.lastName}`
                     : currentUser.name || "Unnamed User"}
                 </h3>
-                <p className="text-muted-foreground">{currentUser.email}</p>
+                <p className="text-sm text-muted-foreground">
+                  {currentUser.email}
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">
                   Name
                 </label>
-                <div className="p-3 bg-muted rounded-lg">
+                <div className="p-3 bg-muted/50 rounded-lg border border-border/50 text-sm">
                   {currentUser.firstName && currentUser.lastName
                     ? `${currentUser.firstName} ${currentUser.lastName}`
                     : currentUser.name || "—"}
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">
                   Email
                 </label>
-                <div className="p-3 bg-muted rounded-lg">
+                <div className="p-3 bg-muted/50 rounded-lg border border-border/50 text-sm">
                   {currentUser.email}
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                <label className="block text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">
                   Role
                 </label>
-                <div className="p-3 bg-muted rounded-lg">Administrator</div>
+                <div className="p-3 bg-muted/50 rounded-lg border border-border/50 text-sm">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary">
+                    Administrator
+                  </span>
+                </div>
               </div>
             </div>
           </>
         )}
       </CardContent>
-      <CardFooter className="border-t pt-4">
+      <CardFooter className="border-t border-border pt-4">
         {isEditing ? (
           <div className="flex space-x-2 w-full">
             <Button

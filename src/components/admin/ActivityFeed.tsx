@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
-import { io, Socket } from "socket.io-client";
-import { useQuery } from "@tanstack/react-query";
-import type { Activity } from "@/types";
-import { systemService } from "@/services/system";
+import type React from "react"
+
+import { useEffect, useState, useRef } from "react"
+import { io, type Socket } from "socket.io-client"
+import { useQuery } from "@tanstack/react-query"
+import { systemService } from "@/services/system"
 import {
   Bell,
   Clock,
@@ -14,19 +15,20 @@ import {
   Trash2,
   ChevronDown,
   AlertCircle,
-} from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+} from "lucide-react"
+import { AnimatePresence, motion } from "framer-motion"
+import type { Activity } from "@/types/system.types"
 
-type ActivityFeedProps = { showHeader?: boolean };
+type ActivityFeedProps = { showHeader?: boolean }
 
-type IconType = React.ComponentType<{ className?: string }>;
+type IconType = React.ComponentType<{ className?: string }>
 
 type IconSpec = {
-  Icon: IconType;
-  colorClass: string;
-  bgClass: string;
-  label?: string;
-};
+  Icon: IconType
+  colorClass: string
+  bgClass: string
+  label?: string
+}
 
 const actionToIcon: Record<string, IconSpec> = {
   user_register: {
@@ -71,7 +73,7 @@ const actionToIcon: Record<string, IconSpec> = {
     bgClass: "bg-rose-100 dark:bg-rose-900/30",
     label: "USER",
   },
-};
+}
 
 const getIconForAction = (action?: string): IconSpec => {
   if (!action)
@@ -79,182 +81,161 @@ const getIconForAction = (action?: string): IconSpec => {
       Icon: Bell as unknown as IconType,
       colorClass: "text-blue-600 dark:text-blue-400",
       bgClass: "bg-blue-100 dark:bg-blue-900/30",
-    };
-  const key = action.toLowerCase();
-  if (key.includes("lock")) return actionToIcon.lock_user;
-  if (key.includes("unlock")) return actionToIcon.unlock_user;
-  if (key.includes("block")) return actionToIcon.block_user;
+    }
+  const key = action.toLowerCase()
+  if (key.includes("lock")) return actionToIcon.lock_user
+  if (key.includes("unlock")) return actionToIcon.unlock_user
+  if (key.includes("block")) return actionToIcon.block_user
   return (
     actionToIcon[key] ?? {
       Icon: Bell as unknown as IconType,
       colorClass: "text-blue-600 dark:text-blue-400",
       bgClass: "bg-blue-100 dark:bg-blue-900/30",
     }
-  );
-};
+  )
+}
 
-// Helper function to format activity details
 const formatActivityDetails = (activity: Activity): string => {
-  const { action, metadata } = activity;
+  const { action, metadata } = activity
 
-  // If we have a custom description, use it
   if (metadata?.description) {
-    return metadata.description as string;
+    return metadata.description as string
   }
 
-  // Otherwise, create a generic description based on action
   switch (action?.toLowerCase()) {
     case "user_register":
-      return `New user registered: ${metadata?.email || "Unknown"}`;
+      return `New user registered: ${metadata?.email || "Unknown"}`
     case "lock_user":
     case "block_user":
       if (metadata?.targetUser) {
         const targetUser = metadata.targetUser as {
-          name: string;
-          email: string;
-        };
-        const actor = metadata.actor as { name: string };
+          name: string
+          email: string
+        }
+        const actor = metadata.actor as { name: string }
         return `${actor?.name || "Admin"} ${
           action.toLowerCase().includes("lock") ? "locked" : "blocked"
-        } user ${targetUser.name || targetUser.email}`;
+        } user ${targetUser.name || targetUser.email}`
       }
-      return `User locked: ${metadata?.userId || "Unknown"}`;
+      return `User locked: ${metadata?.userId || "Unknown"}`
     case "unlock_user":
       if (metadata?.targetUser) {
         const targetUser = metadata.targetUser as {
-          name: string;
-          email: string;
-        };
-        const actor = metadata.actor as { name: string };
-        return `${actor?.name || "Admin"} unlocked user ${
-          targetUser.name || targetUser.email
-        }`;
+          name: string
+          email: string
+        }
+        const actor = metadata.actor as { name: string }
+        return `${actor?.name || "Admin"} unlocked user ${targetUser.name || targetUser.email}`
       }
-      return `User unlocked: ${metadata?.userId || "Unknown"}`;
+      return `User unlocked: ${metadata?.userId || "Unknown"}`
     case "create_dataset":
-      return `Dataset created: ${metadata?.name || "Unnamed dataset"}`;
+      return `Dataset created: ${metadata?.name || "Unnamed dataset"}`
     case "create_chart":
-      return `Chart created: ${metadata?.name || "Unnamed chart"} (${
-        metadata?.type || "Unknown type"
-      })`;
+      return `Chart created: ${metadata?.name || "Unnamed chart"} (${metadata?.type || "Unknown type"})`
     case "delete_self_account":
       if (metadata?.actor) {
-        const actor = metadata.actor as { name: string; email: string };
-        return `User deleted their account: ${actor.name || actor.email}`;
+        const actor = metadata.actor as { name: string; email: string }
+        return `User deleted their account: ${actor.name || actor.email}`
       }
-      return "User deleted their account";
+      return "User deleted their account"
     default:
-      return activity.resource || action || "Unknown activity";
+      return activity.resource || action || "Unknown activity"
   }
-};
+}
 
-// Helper function to get additional details for the expandable section
-const getAdditionalDetails = (
-  activity: Activity
-): Record<string, unknown> | null => {
-  const { metadata } = activity;
+const getAdditionalDetails = (activity: Activity): Record<string, unknown> | null => {
+  const { metadata } = activity
 
-  // If we have enriched metadata, we might want to show specific details
   if (metadata) {
-    // Create a copy of metadata without the enriched fields we've already displayed
-    const additionalDetails: Record<string, unknown> = { ...metadata };
+    const additionalDetails: Record<string, unknown> = { ...metadata }
+    delete additionalDetails.description
+    delete additionalDetails.actor
+    delete additionalDetails.targetUser
 
-    // Remove fields we've already used in the main display
-    delete additionalDetails.description;
-    delete additionalDetails.actor;
-    delete additionalDetails.targetUser;
-
-    // Only return if there are other details to show
     if (Object.keys(additionalDetails).length > 0) {
-      return additionalDetails;
+      return additionalDetails
     }
   }
 
-  return null;
-};
+  return null
+}
 
 export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const socketRef = useRef<Socket | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([])
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+  const socketRef = useRef<Socket | null>(null)
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["activityHistory"],
     queryFn: async () => systemService.getActivityLog(),
     staleTime: 5 * 60 * 1000,
-  });
+  })
 
   useEffect(() => {
-    if (data) setActivities(data);
-  }, [data]);
+    if (data) setActivities(data)
+  }, [data])
 
   useEffect(() => {
-    const wsUrl = "/admin-activity";
+    const wsUrl = "/admin-activity"
     const socket: Socket = io(wsUrl, {
       path: "/socket.io",
       transports: ["websocket"],
-    });
-    socketRef.current = socket;
-    socket.on("connect", () => console.log("ws connected", socket.id));
+    })
+    socketRef.current = socket
+    socket.on("connect", () => console.log("ws connected", socket.id))
     socket.on("activity:created", (act: Activity) => {
-      setActivities((prev) => [act, ...prev].slice(0, 200));
-    });
+      setActivities((prev) => [act, ...prev].slice(0, 200))
+    })
     return () => {
-      socket.disconnect();
-    };
-  }, []);
+      socket.disconnect()
+    }
+  }, [])
 
   if (isLoading) {
     return (
-      <div className="p-5 rounded-xl bg-card border shadow-sm">
+      <div className="rounded-lg bg-card border border-border shadow-sm">
         {showHeader && (
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-primary/10">
+          <div className="flex items-center justify-between p-6 border-b border-border">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-primary/10">
                 <Bell className="w-5 h-5 text-primary" />
               </div>
-              <h2 className="text-lg font-semibold">Activity Feed</h2>
+              <div>
+                <h2 className="text-base font-semibold text-foreground">Activity Feed</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Real-time system events</p>
+              </div>
             </div>
-            <span className="text-xs px-2 py-1 bg-muted rounded-full text-muted-foreground">
-              Loading...
-            </span>
           </div>
         )}
-        <div className="flex items-center justify-center py-8">
+        <div className="flex items-center justify-center py-12">
           <div className="flex flex-col items-center gap-2">
             <Clock className="w-6 h-6 text-muted-foreground animate-spin" />
-            <p className="text-sm text-muted-foreground">
-              Loading activities...
-            </p>
+            <p className="text-sm text-muted-foreground">Loading activities...</p>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
     return (
-      <div className="p-5 rounded-xl bg-card border shadow-sm">
+      <div className="rounded-lg bg-card border border-border shadow-sm">
         {showHeader && (
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-primary/10">
+          <div className="flex items-center justify-between p-6 border-b border-border">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-primary/10">
                 <Bell className="w-5 h-5 text-primary" />
               </div>
-              <h2 className="text-lg font-semibold">Activity Feed</h2>
+              <h2 className="text-base font-semibold">Activity Feed</h2>
             </div>
           </div>
         )}
-        <div className="flex flex-col items-center justify-center py-8 text-center">
+        <div className="flex flex-col items-center justify-center py-12 text-center p-6">
           <div className="p-3 rounded-full bg-destructive/10 mb-3">
             <AlertCircle className="h-6 w-6 text-destructive" />
           </div>
-          <p className="text-destructive font-medium mb-1">
-            Error loading activities
-          </p>
-          <p className="text-sm text-muted-foreground mb-4">
-            Failed to fetch activity data
-          </p>
+          <p className="text-destructive font-medium mb-1">Error loading activities</p>
+          <p className="text-sm text-muted-foreground mb-4">Failed to fetch activity data</p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
@@ -263,25 +244,23 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="rounded-xl bg-card border shadow-sm">
+    <div className="rounded-lg bg-card border border-border shadow-sm overflow-hidden">
       {showHeader && (
-        <div className="flex items-center justify-between p-5 border-b">
+        <div className="flex items-center justify-between p-6 border-b border-border bg-card/50">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="p-2.5 rounded-lg bg-primary/10">
               <Bell className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">Activity Feed</h2>
-              <p className="text-xs text-muted-foreground">
-                Real-time system events
-              </p>
+              <h2 className="text-base font-semibold text-foreground">Activity Feed</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Real-time system events</p>
             </div>
           </div>
-          <span className="text-xs px-2 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full flex items-center gap-1">
+          <span className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full flex items-center gap-1.5 font-medium">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
             Live
           </span>
@@ -290,11 +269,11 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
       <div className="max-h-[500px] overflow-y-auto">
         <AnimatePresence initial={false}>
           {activities.map((a: Activity) => {
-            const dt = new Date(a.createdAt);
-            const spec = getIconForAction(a.action);
-            const isOpen = !!expanded[a.id];
-            const details = formatActivityDetails(a);
-            const additionalDetails = getAdditionalDetails(a);
+            const dt = new Date(a.createdAt)
+            const spec = getIconForAction(a.action)
+            const isOpen = !!expanded[a.id]
+            const details = formatActivityDetails(a)
+            const additionalDetails = getAdditionalDetails(a)
 
             return (
               <motion.div
@@ -307,7 +286,7 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
                 animate={{ opacity: 1, y: 0, backgroundColor: "rgba(0,0,0,0)" }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ type: "spring", stiffness: 380, damping: 28 }}
-                className="p-4 border-b last:border-b-0 hover:bg-accent/30 transition-colors"
+                className="p-4 border-b border-border/50 last:border-b-0 hover:bg-accent/40 transition-colors"
                 layout
               >
                 <div className="flex items-start gap-3">
@@ -320,7 +299,7 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <div className="font-medium text-sm">{details}</div>
+                      <div className="font-medium text-sm text-foreground">{details}</div>
                       <div className="text-xs text-muted-foreground whitespace-nowrap">
                         {dt.toLocaleTimeString([], {
                           hour: "2-digit",
@@ -328,26 +307,16 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
                         })}
                       </div>
                     </div>
-                    <div className="text-xs mt-1 text-muted-foreground">
-                      {spec.label ?? ""}
-                    </div>
-                    <div className="text-sm text-muted-foreground truncate mt-1">
-                      {a.resource}
-                    </div>
+                    <div className="text-xs mt-1 text-muted-foreground font-medium">{spec.label ?? ""}</div>
+                    <div className="text-sm text-muted-foreground truncate mt-1">{a.resource}</div>
                     {(additionalDetails || a.metadata) && (
                       <div className="mt-3">
                         <button
-                          onClick={() =>
-                            setExpanded((s) => ({ ...s, [a.id]: !isOpen }))
-                          }
-                          className="text-xs text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                          onClick={() => setExpanded((s) => ({ ...s, [a.id]: !isOpen }))}
+                          className="text-xs text-primary hover:underline flex items-center gap-1 cursor-pointer font-medium"
                           aria-expanded={isOpen}
                         >
-                          <ChevronDown
-                            className={`w-3 h-3 transition-transform ${
-                              isOpen ? "rotate-180" : ""
-                            }`}
-                          />
+                          <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                           {isOpen ? "Hide details" : "Show details"}
                         </button>
                         <AnimatePresence initial={false}>
@@ -356,13 +325,9 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: "auto", opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              className="text-xs mt-2 p-3 bg-muted/50 rounded-lg overflow-x-auto"
+                              className="text-xs mt-2 p-3 bg-muted/50 rounded-lg overflow-x-auto font-mono"
                             >
-                              {JSON.stringify(
-                                additionalDetails || a.metadata,
-                                null,
-                                2
-                              )}
+                              {JSON.stringify(additionalDetails || a.metadata, null, 2)}
                             </motion.pre>
                           )}
                         </AnimatePresence>
@@ -371,7 +336,7 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
                   </div>
                 </div>
               </motion.div>
-            );
+            )
           })}
         </AnimatePresence>
         {activities.length === 0 && (
@@ -379,13 +344,11 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
             <div className="p-3 rounded-full bg-muted w-12 h-12 flex items-center justify-center mx-auto mb-3">
               <Bell className="w-6 h-6 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground">No activities yet</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              System events will appear here
-            </p>
+            <p className="text-muted-foreground font-medium">No activities yet</p>
+            <p className="text-xs text-muted-foreground mt-1">System events will appear here</p>
           </div>
         )}
       </div>
     </div>
-  );
+  )
 }

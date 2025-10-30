@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight, Syringe } from "lucide-react";
+import { ArrowLeft, ArrowRight, Subscript, Syringe } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface SidebarItem {
@@ -77,8 +77,13 @@ const sidebarItems: SidebarItem[] = [
   {
     title: "System Status",
     href: "/admin/system",
-    icon: (<Syringe />)
-  }
+    icon: <Syringe />,
+  },
+  {
+    title: "Subcription",
+    href: "/admin/subscriptions",
+    icon: <Subscript />,
+  },
 ];
 
 interface DashboardLayoutProps {
@@ -126,16 +131,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-card text-card-foreground border-r shadow-sm transition-all duration-300 ease-in-out flex flex-col",
+          "bg-sidebar text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-all duration-300 ease-in-out flex flex-col",
           sidebarOpen ? "w-64" : "w-20"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar header */}
-          <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center justify-between p-4 border-b border-sidebar-border bg-gradient-to-r from-primary/5 to-transparent">
             {sidebarOpen && (
-              <h1 className="text-lg font-semibold flex items-center">
-                <span className="bg-primary text-primary-foreground p-1 rounded mr-2">
+              <h1 className="text-lg font-bold flex items-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                <span className="bg-gradient-to-br from-primary to-accent text-primary-foreground p-2 rounded-lg mr-2 shadow-md">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -158,16 +163,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="ml-auto rounded-full"
+              className="ml-auto rounded-lg hover:bg-sidebar-accent transition-all"
             >
               {sidebarOpen ? (
-                <div>
-                  <ArrowLeft />
-                </div>
+                <ArrowLeft className="h-5 w-5" />
               ) : (
-                <div>
-                  <ArrowRight />
-                </div>
+                <ArrowRight className="h-5 w-5" />
               )}
             </Button>
           </div>
@@ -181,21 +182,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <Link
                       to={item.href}
                       className={cn(
-                        "flex items-center rounded-md px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
-                        location.pathname === item.href &&
-                          "bg-accent text-accent-foreground"
+                        "flex items-center rounded-lg px-3 py-3 text-sm transition-all duration-200",
+                        location.pathname === item.href
+                          ? "bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md"
+                          : "hover:bg-sidebar-accent text-sidebar-foreground hover:text-sidebar-accent-foreground"
                       )}
                     >
                       <span
                         className={cn(
-                          "flex items-center justify-center text-muted-foreground",
+                          "flex items-center justify-center transition-all",
+                          location.pathname === item.href
+                            ? "text-primary-foreground"
+                            : "text-muted-foreground",
                           sidebarOpen ? "mr-3" : "mr-0 mx-auto"
                         )}
                       >
                         {item.icon}
                       </span>
                       {sidebarOpen && (
-                        <span className="font-medium text-sm">
+                        <span className="font-semibold text-sm">
                           {item.title}
                         </span>
                       )}
@@ -208,19 +213,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* Sidebar footer */}
           {sidebarOpen && (
-            <div className="p-4 border-t">
+            <div className="p-4 border-t border-sidebar-border bg-gradient-to-r from-primary/5 to-transparent">
               <div className="flex items-center">
-                <div className="bg-muted rounded-full w-8 h-8 flex items-center justify-center">
-                  <span className="font-semibold text-foreground text-sm">
+                <div className="bg-gradient-to-br from-primary to-accent rounded-full w-10 h-10 flex items-center justify-center shadow-md">
+                  <span className="font-bold text-primary-foreground text-sm">
                     {user?.firstName?.charAt(0) || user?.name?.charAt(0) || "A"}
                   </span>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium">
+                  <p className="text-sm font-semibold">
                     {user?.firstName && user?.lastName
                       ? `${user.firstName} ${user.lastName}`
                       : user?.name || "Admin User"}
                   </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Admin</p>
                 </div>
               </div>
             </div>
@@ -231,20 +237,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b z-10">
-          <div className="flex items-center justify-between px-4 py-3">
+        <header className="bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 border-b border-border/40 z-10">
+          <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center">
-              <h1 className="text-lg font-semibold">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 {sidebarItems.find((item) => item.href === location.pathname)
                   ?.title || "Dashboard"}
               </h1>
             </div>
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center gap-2">
               <ThemeToggle />
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full relative"
+                className="rounded-lg hover:bg-accent relative"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -260,7 +266,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                   />
                 </svg>
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
               </Button>
 
               {/* User menu dropdown */}
@@ -268,11 +274,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-full"
+                  className="rounded-full hover:ring-2 hover:ring-primary/50"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                 >
-                  <div className="bg-muted rounded-full w-8 h-8 flex items-center justify-center">
-                    <span className="font-semibold">
+                  <div className="bg-gradient-to-br from-primary to-accent rounded-full w-9 h-9 flex items-center justify-center shadow-md">
+                    <span className="font-bold text-primary-foreground">
                       {user?.firstName?.charAt(0) ||
                         user?.name?.charAt(0) ||
                         "A"}
@@ -281,9 +287,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-popover text-popover-foreground rounded-md shadow-md py-1 z-50 border">
+                  <div className="absolute right-0 mt-2 w-48 bg-popover text-popover-foreground rounded-lg shadow-lg py-1 z-50 border border-border backdrop-blur-sm">
                     <button
-                      className="block w-full text-left px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                      className="block w-full text-left px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors rounded-md mx-1"
                       onClick={() => {
                         handleLogout();
                         setUserMenuOpen(false);

@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { SystemStatus } from "./components/SystemStatus";
 import UserDetailPage from "./pages/UserDetailPage";
+import { SubscriptionManagementPage } from "./pages/SubscriptionManagementPage";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
                     element={<AdminUserManagementPage />}
                   />
                   <Route path="/admin/system" element={<SystemStatus />} />
+                  <Route path="/admin/subscriptions" element={<SubscriptionManagementPage />} />
                 </Routes>
               </DashboardLayout>
             </ProtectedRoute>
