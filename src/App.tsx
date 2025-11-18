@@ -8,12 +8,14 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { SystemStatus } from "./components/SystemStatus";
 import UserDetailPage from "./pages/UserDetailPage";
 import { SubscriptionManagementPage } from "./pages/SubscriptionManagementPage";
+import { ToastProvider } from "./components/ui/toast";
 
 function App() {
   return (
-    <>
+    <ToastProvider>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+
         <Route
           path="/*"
           element={
@@ -28,14 +30,17 @@ function App() {
                     element={<AdminUserManagementPage />}
                   />
                   <Route path="/admin/system" element={<SystemStatus />} />
-                  <Route path="/admin/subscriptions" element={<SubscriptionManagementPage />} />
+                  <Route
+                    path="/admin/subscriptions"
+                    element={<SubscriptionManagementPage />}
+                  />
                 </Routes>
               </DashboardLayout>
             </ProtectedRoute>
           }
         />
       </Routes>
-    </>
+    </ToastProvider>
   );
 }
 
