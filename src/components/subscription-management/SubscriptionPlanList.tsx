@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import type { SubscriptionPlan } from "../../types";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/components/ui/toast";
@@ -17,18 +17,9 @@ export const SubscriptionPlanList: React.FC<SubscriptionPlanListProps> = ({
   onDelete,
 }) => {
   const { data: plans, isLoading, error, refetch } = useSubscriptionPlans();
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
   const { toast } = useToast();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (error) {
       toast({
         title: "Error fetching plans",
@@ -37,6 +28,14 @@ export const SubscriptionPlanList: React.FC<SubscriptionPlanListProps> = ({
       });
     }
   }, [error, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   if (error) {
     return (
