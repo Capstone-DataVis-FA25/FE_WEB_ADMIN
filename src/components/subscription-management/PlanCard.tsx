@@ -10,6 +10,11 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
+import {
+  formatPrice,
+  formatInterval,
+  formatDate,
+} from "../../helpers/formatter";
 
 interface PlanCardProps {
   plan: SubscriptionPlan;
@@ -22,32 +27,6 @@ export const PlanCard: React.FC<PlanCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const formatPrice = (price: number, currency: string) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency || "USD",
-    }).format(price);
-  };
-
-  const formatInterval = (interval: string) => {
-    switch (interval?.toLowerCase()) {
-      case "month":
-        return "/month";
-      case "year":
-        return "/year";
-      default:
-        return `/${interval}`;
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   return (
     <Card className="glass-card card-shadow-lg flex flex-col h-full rounded-2xl border border-border bg-card/80 dark:bg-card/70 transition-shadow hover:shadow-2xl">
       <CardHeader className="pb-2">
@@ -122,7 +101,6 @@ export const PlanCard: React.FC<PlanCardProps> = ({
         <div className="text-xs text-muted-foreground mt-6 space-y-1">
           <div>Created: {formatDate(plan.createdAt)}</div>
           <div>Updated: {formatDate(plan.updatedAt)}</div>
-          {plan.stripePriceId && <div>Stripe ID: {plan.stripePriceId}</div>}
         </div>
       </CardContent>
       <CardFooter className="flex gap-3 justify-between pt-2">

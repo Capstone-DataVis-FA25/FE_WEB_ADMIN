@@ -7,7 +7,7 @@ import type {
 import { SubscriptionPlanList } from "../components/subscription-management/SubscriptionPlanList";
 import { SubscriptionPlanForm } from "../components/subscription-management/SubscriptionPlanForm";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/components/ui/toast";
 import { Spinner } from "@/components/ui/spinner";
 import {
   useCreateSubscriptionPlan,
@@ -21,8 +21,7 @@ export const SubscriptionManagementPage: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
     null
   );
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { toast } = useToast();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState<SubscriptionPlan | null>(
     null
@@ -57,7 +56,7 @@ export const SubscriptionManagementPage: React.FC = () => {
     planData: CreateSubscriptionPlanDto | UpdateSubscriptionPlanDto
   ) => {
     try {
-      setErrorMessage(null);
+      // clear previous
 
       if (selectedPlan) {
         // Update existing plan
@@ -68,13 +67,20 @@ export const SubscriptionManagementPage: React.FC = () => {
           },
           {
             onSuccess: () => {
-              setSuccessMessage("Subscription plan updated successfully!");
+              toast({
+                title: "Subscription plan updated",
+                description: "Subscription plan updated successfully!",
+                variant: "success",
+              });
               setCurrentView("list");
             },
             onError: (error: unknown) => {
-              setErrorMessage(
-                "Failed to update subscription plan. Please try again."
-              );
+              toast({
+                title: "Update failed",
+                description:
+                  "Failed to update subscription plan. Please try again.",
+                variant: "destructive",
+              });
               console.error("Error updating plan:", error);
             },
           }
@@ -83,13 +89,20 @@ export const SubscriptionManagementPage: React.FC = () => {
         // Create new plan
         createPlan(planData as CreateSubscriptionPlanDto, {
           onSuccess: () => {
-            setSuccessMessage("Subscription plan created successfully!");
+            toast({
+              title: "Subscription plan created",
+              description: "Subscription plan created successfully!",
+              variant: "success",
+            });
             setCurrentView("list");
           },
           onError: (error: unknown) => {
-            setErrorMessage(
-              "Failed to create subscription plan. Please try again."
-            );
+            toast({
+              title: "Create failed",
+              description:
+                "Failed to create subscription plan. Please try again.",
+              variant: "destructive",
+            });
             console.error("Error creating plan:", error);
           },
         });
@@ -103,18 +116,25 @@ export const SubscriptionManagementPage: React.FC = () => {
     if (!planToDelete) return;
 
     try {
-      setErrorMessage(null);
+      // clear previous
 
       deletePlan(planToDelete.id, {
         onSuccess: () => {
-          setSuccessMessage("Subscription plan deleted successfully!");
+          toast({
+            title: "Deleted",
+            description: "Subscription plan deleted successfully!",
+            variant: "success",
+          });
           setIsDeleteModalOpen(false);
           setPlanToDelete(null);
         },
         onError: (error: unknown) => {
-          setErrorMessage(
-            "Failed to delete subscription plan. Please try again."
-          );
+          toast({
+            title: "Delete failed",
+            description:
+              "Failed to delete subscription plan. Please try again.",
+            variant: "destructive",
+          });
           console.error("Error deleting plan:", error);
         },
       });
@@ -152,23 +172,7 @@ export const SubscriptionManagementPage: React.FC = () => {
       </div>
 
       <div className="mt-8">
-        {successMessage && (
-          <div className="mb-6">
-            <Alert variant="success">
-              <AlertTitle>Success</AlertTitle>
-              <AlertDescription>{successMessage}</AlertDescription>
-            </Alert>
-          </div>
-        )}
-
-        {errorMessage && (
-          <div className="mb-6">
-            <Alert variant="destructive">
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
-          </div>
-        )}
+        {/* messages are shown via toast */}
 
         {currentView === "list" ? (
           <SubscriptionPlanList onEdit={handleEdit} onDelete={handleDelete} />

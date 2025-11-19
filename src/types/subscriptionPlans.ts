@@ -14,8 +14,7 @@ export interface SubscriptionPlan {
     features?: string[];
     limits?: PlanLimits;
     isActive: boolean;
-    sortOrder: number;
-    stripePriceId?: string;
+    // sortOrder and stripePriceId removed
     createdAt: string;
     updatedAt: string;
 }
@@ -29,8 +28,7 @@ export interface CreateSubscriptionPlanDto {
     features?: string[];
     limits?: PlanLimits;
     isActive?: boolean;
-    sortOrder?: number;
-    stripePriceId?: string;
+    // removed: sortOrder, stripePriceId
 }
 
 export interface UpdateSubscriptionPlanDto {
@@ -42,6 +40,5 @@ export interface UpdateSubscriptionPlanDto {
     features?: string[];
     limits?: PlanLimits;
     isActive?: boolean;
-    sortOrder?: number;
-    stripePriceId?: string;
+    // removed: sortOrder, stripePriceId
 }

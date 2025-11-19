@@ -24,7 +24,7 @@ export const useUpdateSubscriptionPlan = () => {
     return useMutation({
         mutationFn: ({ id, planData }: { id: string; planData: UpdateSubscriptionPlanDto }) =>
             subscriptionPlansApi.updatePlan(id, planData),
-        onSuccess: (data, variables) => {
+        onSuccess: (_, variables) => {
             // Invalidate and refetch the updated plan
             queryClient.invalidateQueries({ queryKey: subscriptionPlanKeys.detail(variables.id) });
             // Also invalidate the list to update the list view
