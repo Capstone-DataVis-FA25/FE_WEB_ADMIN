@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { userService } from "../services/user";
+import { systemService } from "@/services/system";
 import { Spinner } from "../components/ui/spinner";
 import { Alert, AlertTitle, AlertDescription } from "../components/ui/alert";
 import {
@@ -10,16 +11,10 @@ import {
   CardContent,
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import {
-  UsersIcon,
-  CheckCircleIcon,
-  TrendingUpIcon,
-  ClipboardListIcon,
-  UsersRoundIcon,
-  Eye,
-} from "lucide-react";
+import { UsersIcon, CheckCircleIcon, TrendingUpIcon, ClipboardListIcon, ArrowRight } from 'lucide-react';
 import type { User } from "@/types/user.types";
-import ActivityFeed from "@/components/admin/ActivityFeed";
+import { UserRegistrationChart } from "@/components/dashboard/UserRegistrationChart";
+import { ActivityDistributionChart } from "@/components/dashboard/ActivityDistributionChart";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -42,6 +37,11 @@ export default function DashboardPage() {
     queryFn: () => userService.getProfile(),
   });
 
+  const { data: activities } = useQuery({
+    queryKey: ["activityHistory"],
+    queryFn: async () => systemService.getActivityLog(),
+  });
+
   if (usersLoading || profileLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -62,11 +62,6 @@ export default function DashboardPage() {
   }
 
   const totalUsers = users?.length || 0;
-  const recentUsers = users?.slice(0, 5) || [];
-
-  const handleViewUser = (id: string) => {
-    navigate(`/users/${id}`);
-  };
 
   return (
     <div className="space-y-6">
@@ -156,15 +151,19 @@ export default function DashboardPage() {
           <CardContent>
             <div className="flex items-baseline">
               <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                +12%
+                {activities?.length || 0}
               </p>
               <p className="ml-2 text-sm text-muted-foreground">
-                from last week
+                events
               </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-2 font-medium">
-              Growth rate
-            </p>
+            <Button 
+              variant="link" 
+              className="p-0 h-auto text-xs text-purple-600 dark:text-purple-400 mt-2 font-medium flex items-center gap-1"
+              onClick={() => navigate('/admin/activity')}
+            >
+              View full feed <ArrowRight className="w-3 h-3" />
+            </Button>
           </CardContent>
         </Card>
 
@@ -194,64 +193,8 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 rounded-xl border border-border shadow-lg bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
-          <CardHeader className="pb-4 border-b border-border">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-accent">
-                <UsersRoundIcon className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <CardTitle className="text-lg font-bold">Recent Users</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6">
-            {recentUsers.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                  <UsersRoundIcon className="h-10 w-10 text-primary" />
-                </div>
-                <p className="text-muted-foreground font-semibold">
-                  No users found
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {recentUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-border hover:bg-accent/40 transition-all duration-200 hover:shadow-md"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="bg-gradient-to-br from-primary to-accent rounded-xl w-12 h-12 flex items-center justify-center text-primary-foreground font-bold shadow-md">
-                        {user.name ? user.name.charAt(0).toUpperCase() : ""}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-sm text-foreground">
-                          {user.name}
-                        </h3>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => handleViewUser(user.id)}
-                      className="cursor-pointer bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg"
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <div className="lg:col-span-1">
-          <ActivityFeed showHeader={true} />
-        </div>
+        <UserRegistrationChart users={users || []} />
+        <ActivityDistributionChart activities={activities || []} />
       </div>
     </div>
   );

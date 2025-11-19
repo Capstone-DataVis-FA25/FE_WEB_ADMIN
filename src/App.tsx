@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { SystemStatus } from "./components/SystemStatus";
 import UserDetailPage from "./pages/UserDetailPage";
 import { SubscriptionManagementPage } from "./pages/SubscriptionManagementPage";
+import ActivityFeedPage from "./pages/ActivityFeedPage";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
                   />
                   <Route path="/admin/system" element={<SystemStatus />} />
                   <Route path="/admin/subscriptions" element={<SubscriptionManagementPage />} />
+                  <Route path="/admin/activity" element={<ActivityFeedPage />} />
                 </Routes>
               </DashboardLayout>
             </ProtectedRoute>
