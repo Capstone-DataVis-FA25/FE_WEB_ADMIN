@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { ArrowLeft, Mail, Calendar, Shield, CheckCircle2, XCircle, Lock, UserIcon, Activity, Clock, MapPin, AlertCircle, CheckCircle } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
+import { Role } from "@/types/role.enum";
 
 export default function UserDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -86,7 +87,7 @@ export default function UserDetailPage() {
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
                     {user.name || user.firstName || "Unnamed User"}
-                    {user.role === "ADMIN" && (
+                    {user.role === Role.ADMIN && (
                       <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">
                         <Shield className="w-3 h-3 mr-1" /> Admin
                       </Badge>
@@ -140,7 +141,7 @@ export default function UserDetailPage() {
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Role</label>
-                <p className="font-medium text-slate-900 dark:text-white text-lg capitalize">{user.role?.toLowerCase() || "User"}</p>
+                <p className="font-medium text-slate-900 dark:text-white text-lg capitalize">{(user.role ? String(user.role).toLowerCase() : "user")}</p>
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">User ID</label>
@@ -200,16 +201,16 @@ export default function UserDetailPage() {
 
               <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${user.isVerified !== false ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'}`}>
-                    {user.isVerified !== false ? <Shield className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                    <div className={`p-2 rounded-full ${user.isVerified ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'}`}>
+                      {user.isVerified ? <Shield className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Verification</p>
+                      <p className={`text-xs ${user.isVerified ? 'text-blue-600' : 'text-amber-600'}`}>
+                        {user.isVerified ? 'Verified' : 'Pending'}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-sm">Verification</p>
-                    <p className={`text-xs ${user.isVerified !== false ? 'text-blue-600' : 'text-amber-600'}`}>
-                      {user.isVerified !== false ? 'Verified' : 'Pending'}
-                    </p>
-                  </div>
-                </div>
                 <Button variant="ghost" size="sm" className="text-xs">Resend</Button>
               </div>
             </CardContent>

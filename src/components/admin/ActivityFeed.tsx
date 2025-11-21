@@ -1,17 +1,29 @@
+"use client"
+
 import type React from "react"
 import { useEffect, useState, useRef } from "react"
 import { io, type Socket } from "socket.io-client"
 import { useQuery } from "@tanstack/react-query"
 import { systemService } from "@/services/system"
-import { Bell, Clock, UserPlus, Lock, Unlock, Database, BarChart3, Trash2, ChevronDown, AlertCircle, ActivityIcon, Info } from 'lucide-react'
+import {
+  Bell,
+  Clock,
+  UserPlus,
+  Lock,
+  Unlock,
+  Database,
+  BarChart3,
+  Trash2,
+  ChevronDown,
+  AlertCircle,
+  ActivityIcon,
+  Info,
+} from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
+import { userService } from "@/services/user"
 import type { Activity } from "@/types/system.types"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-
-const ScrollArea: React.FC<{ className?: string; children?: React.ReactNode }> = ({ className, children }) => {
-  return <div className={cn("overflow-auto", className)}>{children}</div>
-}
 
 type ActivityFeedProps = { showHeader?: boolean }
 
@@ -158,15 +170,121 @@ const getAdditionalDetails = (activity: Activity): Record<string, unknown> | nul
 }
 
 const DetailRow = ({ label, value }: { label: string; value: any }) => (
-  <div className="grid grid-cols-[120px_1fr] gap-2 text-xs py-1 border-b border-border/40 last:border-0">
-    <span className="font-medium text-muted-foreground capitalize">
-      {label.replace(/([A-Z])/g, " $1").trim()}
-    </span>
+  <div className="grid grid-cols-[120px_1fr] gap-2 text-xs py-1 border-b border-slate-200 dark:border-slate-800 last:border-0">
+    <span className="font-medium text-muted-foreground capitalize">{label.replace(/([A-Z])/g, " $1").trim()}</span>
     <span className="text-foreground font-mono break-all">
       {typeof value === "object" ? JSON.stringify(value) : String(value)}
     </span>
   </div>
 )
+
+function ActivityDetails({
+  activity,
+  isOpen,
+  onToggle,
+}: {
+  activity: Activity
+  isOpen: boolean
+  onToggle: () => void
+}) {
+  // resolve actorId from top-level or metadata
+  const actorId = (activity as any).actorId ?? (activity.metadata as any)?.actor?.id
+
+  const { data: actorData } = useQuery({
+    queryKey: actorId ? ["user", actorId] : ["user", "unknown"],
+    queryFn: () => userService.getUserById(actorId as string),
+    enabled: !!actorId,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  // build a display activity that injects actor info into metadata for formatting
+  const displayActor = (activity.metadata as any)?.actor ??
+    (actorData ? { id: actorData.id, name: (actorData as any).name ?? (actorData as any).firstName ?? (actorData as any).email, email: (actorData as any).email } : undefined)
+
+  const displayActivity: Activity = {
+    ...activity,
+    metadata: {
+      ...(activity.metadata ?? {}),
+      ...(displayActor ? { actor: displayActor } : {}),
+    } as Record<string, unknown>,
+  }
+
+  const details = formatActivityDetails(displayActivity)
+  const additionalDetails = getAdditionalDetails(displayActivity)
+
+  const dt = new Date(activity.createdAt)
+
+  return (
+    <>
+      <div className="p-3 flex gap-3 group" onClick={() => additionalDetails && onToggle()}>
+        <div className="flex-1 min-w-0 py-0.5">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <p className="text-sm font-medium text-foreground leading-none mb-1.5">{details}</p>
+              {/* show actor name/email or fallback to actorId when available */}
+              <div className="text-xs text-muted-foreground">
+                {displayActor?.name ? (
+                  <>
+                    <span className="font-medium">{displayActor.name}</span>
+                    {displayActor?.email && <span className="ml-2">• {displayActor.email}</span>}
+                    {displayActor?.id && <span className="ml-2 font-mono text-[11px]">({displayActor.id})</span>}
+                  </>
+                ) : actorId ? (
+                  <span className="font-mono">Actor ID: {actorId}</span>
+                ) : (
+                  <span>Không rõ người thực hiện</span>
+                )}
+              </div>
+            </div>
+
+            <span className="text-[10px] text-muted-foreground whitespace-nowrap font-mono bg-muted/50 px-1.5 py-0.5 rounded">
+              {dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* label and date handled by parent visuals if desired */}
+            <span className="text-xs text-muted-foreground truncate">{dt.toLocaleDateString()}</span>
+          </div>
+        </div>
+
+        {additionalDetails && (
+          <ChevronDown
+            className={cn(
+              "w-4 h-4 text-muted-foreground transition-transform duration-200 mt-1",
+              isOpen && "rotate-180",
+            )}
+          />
+        )}
+      </div>
+
+      <AnimatePresence>
+        {isOpen && additionalDetails && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="px-3 pb-3 pt-0 pl-[52px]">
+              <div className="bg-background/50 rounded-lg border border-slate-200 dark:border-slate-800 p-3 text-xs">
+                <div className="flex items-center gap-2 mb-2 font-medium text-muted-foreground">
+                  <Info className="w-3 h-3" />
+                  Event Details
+                </div>
+                <div className="space-y-1">
+                  {Object.entries(additionalDetails).map(([key, value]) => (
+                    <DetailRow key={key} label={key} value={value} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  )
+}
 
 export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
   const [activities, setActivities] = useState<Activity[]>([])
@@ -201,7 +319,7 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl bg-card border shadow-sm h-full flex flex-col">
+      <div className="rounded-2xl bg-card border border-slate-200 dark:border-slate-800 shadow-sm h-full flex flex-col">
         {showHeader && (
           <div className="p-4 border-b flex items-center gap-2">
             <ActivityIcon className="w-5 h-5 text-primary" />
@@ -217,7 +335,7 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
 
   if (error) {
     return (
-      <div className="rounded-2xl bg-card border shadow-sm h-full flex flex-col">
+      <div className="rounded-2xl bg-card border border-slate-200 dark:border-slate-800 shadow-sm h-full flex flex-col">
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
           <AlertCircle className="w-8 h-8 text-destructive mb-2" />
           <p className="text-sm font-medium">Failed to load activities</p>
@@ -227,9 +345,9 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
   }
 
   return (
-    <div className="rounded-2xl bg-card border shadow-sm overflow-hidden flex flex-col h-full">
+    <div className="rounded-2xl bg-card border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-full">
       {showHeader && (
-        <div className="flex items-center justify-between p-4 border-b bg-muted/30">
+        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-muted/30">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-primary/10 rounded-lg">
               <ActivityIcon className="w-4 h-4 text-primary" />
@@ -245,99 +363,51 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
           </Badge>
         </div>
       )}
-      
-      <ScrollArea className="flex-1 h-[500px]">
-        <div className="p-0">
+
+      <div className="flex-1 overflow-y-auto h-[500px]">
+        <div className="p-4 space-y-2">
           <AnimatePresence initial={false}>
             {activities.map((a: Activity) => {
-              const dt = new Date(a.createdAt)
               const spec = getIconForAction(a.action)
               const isOpen = !!expanded[a.id]
-              const details = formatActivityDetails(a)
-              const additionalDetails = getAdditionalDetails(a)
 
               return (
                 <motion.div
                   key={a.id}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, height: 0 }}
                   className={cn(
-                    "border-b last:border-0 transition-colors",
-                    isOpen ? "bg-muted/30" : "hover:bg-muted/10"
+                    "rounded-xl transition-all duration-200 border",
+                    isOpen
+                      ? "bg-muted/50 border-slate-200 dark:border-slate-800 shadow-sm"
+                      : "border-transparent hover:bg-muted/30 hover:border-slate-200/50 dark:hover:border-slate-800/50",
                   )}
                 >
-                  <div 
-                    className="p-4 flex gap-3 cursor-pointer group"
-                    onClick={() => additionalDetails && setExpanded((s) => ({ ...s, [a.id]: !isOpen }))}
-                  >
-                    <div className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-transform group-hover:scale-105",
-                      spec.bgClass,
-                      spec.colorClass
-                    )}>
+                  <div className={cn("p-3 flex gap-3", isOpen ? "group bg-muted/10" : "group") }>
+                    <div
+                      className={cn(
+                        "w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 shadow-sm",
+                        spec.bgClass,
+                        spec.colorClass,
+                      )}
+                    >
                       <spec.Icon className="w-4 h-4" />
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-medium text-foreground leading-none mb-1.5">
-                          {details}
-                        </p>
-                        <span className="text-[10px] text-muted-foreground whitespace-nowrap font-mono">
-                          {dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        {spec.label && (
-                          <Badge variant="secondary" className="text-[10px] h-4 px-1.5 font-normal">
-                            {spec.label}
-                          </Badge>
-                        )}
-                        <span className="text-xs text-muted-foreground truncate">
-                          {dt.toLocaleDateString()}
-                        </span>
-                      </div>
+                      <ActivityDetails
+                        activity={a}
+                        isOpen={isOpen}
+                        onToggle={() => setExpanded((s) => ({ ...s, [a.id]: !isOpen }))}
+                      />
                     </div>
-
-                    {additionalDetails && (
-                      <ChevronDown className={cn(
-                        "w-4 h-4 text-muted-foreground transition-transform duration-200 mt-1",
-                        isOpen && "rotate-180"
-                      )} />
-                    )}
                   </div>
-
-                  <AnimatePresence>
-                    {isOpen && additionalDetails && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-4 pb-4 pt-0 pl-[52px]">
-                          <div className="bg-background rounded-lg border p-3 shadow-sm">
-                            <div className="flex items-center gap-2 mb-2 text-xs font-medium text-muted-foreground">
-                              <Info className="w-3 h-3" />
-                              Event Details
-                            </div>
-                            <div className="space-y-0.5">
-                              {Object.entries(additionalDetails).map(([key, value]) => (
-                                <DetailRow key={key} label={key} value={value} />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </motion.div>
               )
             })}
           </AnimatePresence>
-          
+
           {activities.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center px-4">
               <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
@@ -348,7 +418,7 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   )
 }

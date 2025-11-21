@@ -10,12 +10,12 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ActivityIcon } from 'lucide-react'
 import type { Activity } from "@/types/system.types"
+import { COLORS } from '@/constants'
 
 interface ActivityDistributionChartProps {
   activities: Activity[]
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 export function ActivityDistributionChart({ activities }: ActivityDistributionChartProps) {
   const chartData = useMemo(() => {

@@ -2,26 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { userService } from "@/services/user";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
-import { User, Lock, Edit, Eye, Unlock, Trash2, Shield, CheckCircle2, XCircle, Mail, Search } from 'lucide-react';
-
-type UpdateUserDto = {
-  name?: string;
-  email?: string;
-};
-
-type UserType = {
-  id: number | string;
-  name?: string | null;
-  firstName?: string | null;
-  email?: string | null;
-  isActive?: boolean | null;
-  role?: string | null;
-};
+import { User, Lock, Eye, Unlock, Trash2, Shield, CheckCircle2, Mail, Search } from 'lucide-react';
+import type { User as UserType } from "@/types/user.types";
 
 interface UserListSectionProps {
   users: UserType[];
@@ -30,31 +16,14 @@ interface UserListSectionProps {
 export default function UserListSection({ users }: UserListSectionProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [editingUser, setEditingUser] = useState<UserType | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [editForm, setEditForm] = useState<{ name: string; email: string }>({
-    name: "",
-    email: "",
-  });
 
   const filteredUsers = users?.filter(user => 
     (user.name || user.firstName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     (user.email || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const updateUserMutation = useMutation({
-    mutationFn: ({
-      id,
-      userData,
-    }: {
-      id: number | string;
-      userData: UpdateUserDto;
-    }) => userService.updateUser(id, userData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      setEditingUser(null);
-    },
-  });
+  
 
   const deleteUserMutation = useMutation({
     mutationFn: (id: number | string) => userService.deleteUser(id),
@@ -71,14 +40,7 @@ export default function UserListSection({ users }: UserListSectionProps) {
     },
   });
 
-  const handleUpdateUser = () => {
-    if (editingUser) {
-      updateUserMutation.mutate({
-        id: editingUser.id,
-        userData: editForm,
-      });
-    }
-  };
+  
 
   const handleDeleteUser = (id: number | string) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
@@ -94,13 +56,7 @@ export default function UserListSection({ users }: UserListSectionProps) {
     navigate(`/users/${id}`);
   };
 
-  const startEditing = (user: UserType) => {
-    setEditingUser(user);
-    setEditForm({
-      name: user.firstName || user.name || "",
-      email: user.email || "",
-    });
-  };
+  
 
   return (
     <div className="space-y-6">
@@ -140,65 +96,6 @@ export default function UserListSection({ users }: UserListSectionProps) {
                   key={user.id}
                   className="group p-4 sm:p-6 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors duration-200"
                 >
-                  {editingUser?.id === user.id ? (
-                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-200">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                          <Edit className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-slate-900 dark:text-white text-lg">Edit User</h3>
-                          <p className="text-sm text-slate-500">Update user details below</p>
-                        </div>
-                      </div>
-                      
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="space-y-2">
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Full Name</label>
-                          <Input
-                            value={editForm.name}
-                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                            placeholder="John Doe"
-                            className="bg-white dark:bg-slate-900"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Email Address</label>
-                          <Input
-                            value={editForm.email}
-                            onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                            placeholder="john@example.com"
-                            type="email"
-                            className="bg-white dark:bg-slate-900"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-end gap-3 mt-6">
-                        <Button
-                          variant="ghost"
-                          onClick={() => setEditingUser(null)}
-                          className="text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          onClick={handleUpdateUser}
-                          disabled={updateUserMutation.isPending}
-                          className="bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900"
-                        >
-                          {updateUserMutation.isPending ? (
-                            <>
-                              <Spinner size="sm" className="mr-2" />
-                              Saving Changes...
-                            </>
-                          ) : (
-                            "Save Changes"
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-4">
                         {/* Avatar */}
@@ -206,7 +103,7 @@ export default function UserListSection({ users }: UserListSectionProps) {
                           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-lg font-bold text-slate-500 dark:text-slate-300 shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10">
                             {(user.name || user.firstName || "?").charAt(0).toUpperCase()}
                           </div>
-                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 ${user.isActive !== false ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 ${user.isActive ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
                         </div>
 
                         {/* User Info */}
@@ -233,13 +130,13 @@ export default function UserListSection({ users }: UserListSectionProps) {
                       {/* Status & Actions */}
                       <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pl-16 sm:pl-0">
                         <div className="flex items-center gap-2">
-                          {user.isActive === false ? (
-                            <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
-                              <Lock className="w-3 h-3 mr-1" /> Locked
-                            </Badge>
-                          ) : (
+                          {user.isActive ? (
                             <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800">
                               <CheckCircle2 className="w-3 h-3 mr-1" /> Active
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+                              <Lock className="w-3 h-3 mr-1" /> Locked
                             </Badge>
                           )}
                         </div>
@@ -254,33 +151,19 @@ export default function UserListSection({ users }: UserListSectionProps) {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => startEditing(user)}
-                            className="h-8 w-8 p-0 text-slate-500 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20"
-                            title="Edit User"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
 
                           {user.role !== "ADMIN" && (
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => handleLockUnlockUser(user.id, !user.isActive)}
-                              className={`h-8 w-8 p-0 ${
-                                user.isActive === false 
-                                  ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" 
-                                  : "text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"
-                              }`}
-                              title={user.isActive === false ? "Unlock Account" : "Lock Account"}
+                              className={`h-8 w-8 p-0 ${user.isActive ? "text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20" : "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"}`}
+                              title={user.isActive ? "Lock Account" : "Unlock Account"}
                             >
-                              {user.isActive === false ? (
-                                <Unlock className="h-4 w-4" />
-                              ) : (
+                              {user.isActive ? (
                                 <Lock className="h-4 w-4" />
+                              ) : (
+                                <Unlock className="h-4 w-4" />
                               )}
                             </Button>
                           )}
@@ -297,7 +180,6 @@ export default function UserListSection({ users }: UserListSectionProps) {
                         </div>
                       </div>
                     </div>
-                  )}
                 </div>
               ))}
             </div>
