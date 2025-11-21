@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import type { SubscriptionPlan } from "../../types";
 import { Spinner } from "@/components/ui/spinner";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { useSubscriptionPlans } from "../../hooks";
 import { PlanCard } from ".";
@@ -17,6 +17,17 @@ export const SubscriptionPlanList: React.FC<SubscriptionPlanListProps> = ({
   onDelete,
 }) => {
   const { data: plans, isLoading, error, refetch } = useSubscriptionPlans();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error fetching plans",
+        description: error.message || "Failed to fetch subscription plans",
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
 
   if (isLoading) {
     return (
@@ -29,13 +40,6 @@ export const SubscriptionPlanList: React.FC<SubscriptionPlanListProps> = ({
   if (error) {
     return (
       <div className="mb-6">
-        <Alert variant="destructive">
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            Failed to fetch subscription plans:{" "}
-            {error.message || "Unknown error"}
-          </AlertDescription>
-        </Alert>
         <div className="mt-4 flex justify-center">
           <Button onClick={() => refetch()}>Retry</Button>
         </div>

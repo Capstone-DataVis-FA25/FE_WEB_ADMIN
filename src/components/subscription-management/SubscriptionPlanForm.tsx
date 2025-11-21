@@ -8,7 +8,8 @@ import { LabeledInput } from "@/components/ui/labeled-input";
 import { LabeledTextarea } from "@/components/ui/labeled-textarea";
 import { LabeledSwitch } from "@/components/ui/labeled-switch";
 import { LoadingButton } from "@/components/ui/loading-button";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/components/ui/toast";
+import { validateSubscriptionPlanForm } from "../../utils/form-validation";
 
 interface SubscriptionPlanFormProps {
   plan?: SubscriptionPlan;
@@ -28,7 +29,7 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
   const [name, setName] = useState(plan?.name || "");
   const [description, setDescription] = useState(plan?.description || "");
   const [price, setPrice] = useState(plan?.price.toString() || "");
-  const [currency, setCurrency] = useState(plan?.currency || "USD");
+  const [currency, setCurrency] = useState(plan?.currency || "VND");
   const [interval, setInterval] = useState(plan?.interval || "month");
   const [features, setFeatures] = useState(plan?.features?.join("\n") || "");
   const [maxDatasets, setMaxDatasets] = useState(
@@ -41,11 +42,9 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
     plan?.limits?.maxFileSize?.toString() || ""
   );
   const [isActive, setIsActive] = useState(plan?.isActive ?? true);
-  const [sortOrder, setSortOrder] = useState(plan?.sortOrder.toString() || "0");
-  const [stripePriceId, setStripePriceId] = useState(plan?.stripePriceId || "");
 
-  const [error, setError] = useState<string | null>(null);
   const [featureError, setFeatureError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (plan) {
@@ -59,59 +58,23 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
       setMaxCharts(plan.limits?.maxCharts?.toString() || "");
       setMaxFileSize(plan.limits?.maxFileSize?.toString() || "");
       setIsActive(plan.isActive);
-      setSortOrder(plan.sortOrder.toString());
-      setStripePriceId(plan.stripePriceId || "");
     }
   }, [plan]);
-
-  const validateForm = (): boolean => {
-    if (!name.trim()) {
-      setError("Plan name is required");
-      return false;
-    }
-
-    if (!price || isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
-      setError("Valid price is required");
-      return false;
-    }
-
-    if (
-      maxDatasets &&
-      (isNaN(parseInt(maxDatasets)) || parseInt(maxDatasets) <= 0)
-    ) {
-      setError("Max datasets must be a positive number");
-      return false;
-    }
-
-    if (maxCharts && (isNaN(parseInt(maxCharts)) || parseInt(maxCharts) <= 0)) {
-      setError("Max charts must be a positive number");
-      return false;
-    }
-
-    if (
-      maxFileSize &&
-      (isNaN(parseInt(maxFileSize)) || parseInt(maxFileSize) <= 0)
-    ) {
-      setError("Max file size must be a positive number");
-      return false;
-    }
-
-    if (sortOrder && (isNaN(parseInt(sortOrder)) || parseInt(sortOrder) < 0)) {
-      setError("Sort order must be a non-negative number");
-      return false;
-    }
-
-    return true;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (
+      !validateSubscriptionPlanForm(
+        { name, price, maxDatasets, maxCharts, maxFileSize },
+        toast
+      )
+    ) {
       return;
     }
 
-    setError(null);
+    // clear any previous feature error
+    setFeatureError(null);
 
     try {
       const planData: CreateSubscriptionPlanDto | UpdateSubscriptionPlanDto = {
@@ -132,13 +95,15 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
           maxFileSize: maxFileSize ? parseInt(maxFileSize) : undefined,
         },
         isActive: isActive,
-        sortOrder: parseInt(sortOrder),
-        stripePriceId: stripePriceId || undefined,
       };
 
       await onSubmit(planData);
     } catch (err) {
-      setError("Failed to save subscription plan. Please try again.");
+      toast({
+        title: "Save failed",
+        description: "Failed to save subscription plan. Please try again.",
+        variant: "destructive",
+      });
       console.error("Error saving plan:", err);
     }
   };
@@ -155,14 +120,7 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
           {plan ? "Edit Subscription Plan" : "Create New Subscription Plan"}
         </h3>
 
-        {error && (
-          <div className="mt-4">
-            <Alert variant="destructive">
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          </div>
-        )}
+        {/* error messages are shown as toast notifications */}
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-8">
           {/* General Info */}
@@ -236,21 +194,7 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
               onChange={(e) => setMaxFileSize(e.target.value)}
             />
           </div>
-          {/* Other Fields */}
-          <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
-            <LabeledInput
-              label="Sort Order"
-              type="number"
-              min="0"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            />
-            <LabeledInput
-              label="Stripe Price ID (optional)"
-              value={stripePriceId}
-              onChange={(e) => setStripePriceId(e.target.value)}
-            />
-          </div>
+          {/* Other Fields (removed: sortOrder, stripePriceId) */}
           <div className="flex flex-row items-center gap-4">
             <LabeledSwitch
               checked={isActive}

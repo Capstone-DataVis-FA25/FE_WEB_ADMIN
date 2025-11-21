@@ -9,12 +9,14 @@ import { SystemStatus } from "./components/SystemStatus";
 import UserDetailPage from "./pages/UserDetailPage";
 import { SubscriptionManagementPage } from "./pages/SubscriptionManagementPage";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
+import { ToastProvider } from "./components/ui/toast";
 
 function App() {
   return (
-    <>
+    <ToastProvider>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+
         <Route
           path="/*"
           element={
@@ -37,7 +39,7 @@ function App() {
           }
         />
       </Routes>
-    </>
+    </ToastProvider>
   );
 }
 
