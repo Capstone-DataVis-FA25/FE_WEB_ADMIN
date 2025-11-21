@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight, Subscript, Syringe } from "lucide-react";
+import { Activity, ArrowLeft, ArrowRight, Subscript, Syringe } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface SidebarItem {
@@ -73,6 +73,11 @@ const sidebarItems: SidebarItem[] = [
         />
       </svg>
     ),
+  },
+  {
+    title: "Activity Feed",
+    href: "/admin/activity",
+    icon: <Activity className="h-5 w-5" />,
   },
   {
     title: "System Status",

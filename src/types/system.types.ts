@@ -40,6 +40,8 @@ export interface SystemStatus {
 // Enhanced Activity interface with enriched metadata
 export interface Activity {
     id: string;
+    actorId?: string;
+    actorType?: string;
     createdAt: string;
     action: string;
     resource: string;

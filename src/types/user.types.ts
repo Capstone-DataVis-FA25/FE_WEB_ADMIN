@@ -1,9 +1,11 @@
+import { Role } from './role.enum'
+
 export interface User {
     id: string;
     email: string;
     firstName?: string;
     lastName?: string;
-    role?: 'USER' | 'ADMIN';
+    role?: Role;
     isActive?: boolean;
     isVerified?: boolean;
     createdAt?: string;
