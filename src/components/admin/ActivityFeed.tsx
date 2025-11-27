@@ -364,7 +364,7 @@ export default function ActivityFeed({ showHeader = true }: ActivityFeedProps) {
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto h-[500px]">
+      <div className="flex-1 overflow-y-auto max-h-[500px]">
         <div className="p-4 space-y-2">
           <AnimatePresence initial={false}>
             {activities.map((a: Activity) => {

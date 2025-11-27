@@ -5,6 +5,7 @@ export const API_ENDPOINTS = {
     USER_PASSWORD_CHANGE: '/users/me/change-password',
     REVENUE_TOTAL: '/payments/revenue/total',
     REVENUE_LAST_30_DAYS: '/payments/revenue/last-30-days',
+    ADMIN_TRANSACTIONS: '/payments/transactions',
 } as const;
 
 export const QUERY_KEYS = {

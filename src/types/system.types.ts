@@ -60,3 +60,25 @@ export interface Activity {
         };
     };
 }
+
+export interface Transaction {
+  id: string;
+  userId: string;
+  subscriptionPlanId: string | null;
+  amount: number;
+  currency: string;
+  status: string;
+  provider: string;
+  providerTransactionId: string;
+  metadata: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminTransactionPage {
+  data: Transaction[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
