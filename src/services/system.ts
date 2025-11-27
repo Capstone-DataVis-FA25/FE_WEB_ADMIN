@@ -17,4 +17,22 @@ export const systemService = {
         console.log("activity log: ", response);
         return response.data;
     },
+    /**
+     * Get total revenue (all time)
+     */
+    getTotalRevenue: async (): Promise<number> => {
+        const response = await apiClient.get<{ totalRevenue: number }>(
+            '/payments/revenue/total'
+        );
+        return response.totalRevenue;
+    },
+    /**
+     * Get revenue for last 30 days (returns array for chart)
+     */
+    getRevenueLast30Days: async (): Promise<{ date: string; revenue: number }[]> => {
+        const response = await apiClient.get<{ revenueLast30Days: { date: string; revenue: number }[] }>(
+            '/payments/revenue/last-30-days'
+        );
+        return response.revenueLast30Days;
+    },
 };

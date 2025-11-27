@@ -10,6 +10,7 @@ import UserDetailPage from "./pages/UserDetailPage";
 import { SubscriptionManagementPage } from "./pages/SubscriptionManagementPage";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
 import { ToastProvider } from "./components/ui/toast";
+import RevenueChartPage from "./pages/RevenueChartPage";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
                   <Route path="/admin/system" element={<SystemStatus />} />
                   <Route path="/admin/subscriptions" element={<SubscriptionManagementPage />} />
                   <Route path="/admin/activity" element={<ActivityFeedPage />} />
+                  <Route path="/admin/revenue" element={<RevenueChartPage />} />
                 </Routes>
               </DashboardLayout>
             </ProtectedRoute>

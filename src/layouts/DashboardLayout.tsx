@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Activity, ArrowLeft, ArrowRight, Subscript, Syringe } from "lucide-react";
+import { Activity, ArrowLeft, ArrowRight, Subscript, Syringe,DollarSign } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface SidebarItem {
@@ -88,6 +88,11 @@ const sidebarItems: SidebarItem[] = [
     title: "Subcription",
     href: "/admin/subscriptions",
     icon: <Subscript />,
+  },
+  {
+    title: "Revenue Chart",
+    href: "/admin/revenue",
+    icon: <DollarSign />,
   },
 ];
 
