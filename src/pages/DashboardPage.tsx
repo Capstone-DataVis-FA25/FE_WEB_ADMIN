@@ -11,7 +11,7 @@ import {
   CardContent,
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { UsersIcon, CheckCircleIcon, TrendingUpIcon, ClipboardListIcon, ArrowRight } from 'lucide-react';
+import { UsersIcon, CheckCircleIcon, TrendingUpIcon, ClipboardListIcon, ArrowRight,DollarSign } from 'lucide-react';
 import type { User } from "@/types/user.types";
 import { UserRegistrationChart } from "@/components/dashboard/UserRegistrationChart";
 import { ActivityDistributionChart } from "@/components/dashboard/ActivityDistributionChart";
@@ -40,6 +40,16 @@ export default function DashboardPage() {
   const { data: activities } = useQuery({
     queryKey: ["activityHistory"],
     queryFn: async () => systemService.getActivityLog(),
+  });
+
+  // Revenue query
+  const {
+    data: totalRevenue,
+    isLoading: revenueLoading,
+    error: revenueError,
+  } = useQuery<number>({
+    queryKey: ["totalRevenue"],
+    queryFn: () => systemService.getTotalRevenue(),
   });
 
   if (usersLoading || profileLoading) {
@@ -114,25 +124,32 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        {/* Total Revenue Card (replace System Status) */}
         <Card className="rounded-xl border border-emerald-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/20 dark:to-emerald-900/10">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold text-muted-foreground">
-                System Status
+                Total revenue 
               </CardTitle>
               <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg">
-                <CheckCircleIcon className="h-6 w-6 text-white" />
+                <DollarSign className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex items-baseline">
-              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                Operational
-              </p>
+            <div className="flex items-baseline min-h-[40px]">
+              {revenueLoading ? (
+                <span className="text-base text-muted-foreground">Đang tải...</span>
+              ) : revenueError ? (
+                <span className="text-base text-destructive">Lỗi</span>
+              ) : (
+                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                  {totalRevenue?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                </p>
+              )}
             </div>
             <p className="text-xs text-muted-foreground mt-2 font-medium">
-              All systems normal
+              Total revenue of the system
             </p>
           </CardContent>
         </Card>
