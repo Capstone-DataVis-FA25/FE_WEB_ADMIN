@@ -226,17 +226,17 @@ export default function UserDetailPage() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center border-b border-white/10 pb-3">
                 <span className="text-sm text-slate-400">Joined</span>
-                <span className="font-mono text-sm">
+                <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">
                   {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
                 </span>
               </div>
               <div className="flex justify-between items-center border-b border-white/10 pb-3">
                 <span className="text-sm text-slate-400">Last Login</span>
-                <span className="font-mono text-sm">Just now</span>
+                <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">Just now</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-slate-400">Last Updated</span>
-                <span className="font-mono text-sm">2 days ago</span>
+                <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">2 days ago</span>
               </div>
             </CardContent>
           </Card>
