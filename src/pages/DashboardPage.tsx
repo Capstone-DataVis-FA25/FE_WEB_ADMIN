@@ -11,7 +11,7 @@ import {
   CardContent,
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { UsersIcon, CheckCircleIcon, TrendingUpIcon, ClipboardListIcon, ArrowRight,DollarSign } from 'lucide-react';
+import { UsersIcon, TrendingUpIcon, ClipboardListIcon, ArrowRight, DollarSign } from 'lucide-react';
 import type { User } from "@/types/user.types";
 import { UserRegistrationChart } from "@/components/dashboard/UserRegistrationChart";
 import { ActivityDistributionChart } from "@/components/dashboard/ActivityDistributionChart";

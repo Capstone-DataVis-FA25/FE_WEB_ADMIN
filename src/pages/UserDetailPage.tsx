@@ -4,7 +4,7 @@ import { userService } from "@/services/user";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { ArrowLeft, Mail, Calendar, Shield, CheckCircle2, XCircle, Lock, UserIcon, Activity, Clock, MapPin, AlertCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Mail, Shield, CheckCircle2, XCircle, Lock, UserIcon, Activity, Clock, MapPin, AlertCircle } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Role } from "@/types/role.enum";
 
