@@ -219,8 +219,9 @@ export default function AdminTransactionFeed() {
   }
 
   return (
-    <div className="rounded-2xl bg-card border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-full">
-      <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-muted/30">
+    <div className="rounded-2xl bg-card border border-slate-200 dark:border-slate-800 shadow-sm grid grid-rows-[auto_1fr_auto] h-full min-h-[500px] relative">
+      {/* Sticky header với nền đặc (không trong suốt) */}
+      <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-card dark:bg-card sticky top-0 z-20 shadow-sm">
         <div className="flex items-center gap-2">
           <div className="p-2 bg-primary/10 rounded-lg">
             <CreditCard className="w-4 h-4 text-primary" />
@@ -234,8 +235,8 @@ export default function AdminTransactionFeed() {
           Page {pageData.page} / {pageData.totalPages}
         </span>
       </div>
-
-      <div className="flex-1 overflow-y-auto max-h-[500px]">
+      {/* Khu vực scroll riêng cho danh sách */}
+      <div className="overflow-y-auto overscroll-contain px-0">
         <div className="p-4 space-y-2">
           <AnimatePresence initial={false}>
             {Array.isArray(transactions) && transactions.length > 0 ? (
@@ -292,8 +293,8 @@ export default function AdminTransactionFeed() {
         </div>
       </div>
 
-      {/* Pagination - no shadcn */}
-      <div className="flex items-center justify-between p-4 border-t border-slate-200 dark:border-slate-800">
+      {/* Pagination cố định phía dưới với nền đặc */}
+      <div className="flex items-center justify-between p-4 border-t border-slate-200 dark:border-slate-800 bg-card dark:bg-card sticky bottom-0 z-20 shadow-sm">
         <span className="text-xs text-muted-foreground">Total: {pageData.total} transactions</span>
         <div className="flex gap-2">
           <button
