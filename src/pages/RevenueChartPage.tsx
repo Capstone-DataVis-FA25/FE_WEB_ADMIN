@@ -9,7 +9,6 @@ import AdminTransactionFeed from "@/components/admin/AdminTransactionFeed"
 
 export default function RevenueChartPage() {
   const [tab, setTab] = useState("transactions")
-  const [page, setPage] = useState(1)
 
   const { data: chartData, isLoading: chartLoading, error: chartError } = useQuery({
     queryKey: ["revenueLast30Days"],

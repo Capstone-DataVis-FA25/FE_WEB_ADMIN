@@ -71,7 +71,7 @@ export function ActivityDistributionChart({ activities }: ActivityDistributionCh
                 dataKey="value"
               >
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}-${String((entry as any)?.name ?? index)}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip 
