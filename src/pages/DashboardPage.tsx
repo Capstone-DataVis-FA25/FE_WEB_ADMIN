@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { userService } from "../services/user";
 import { systemService } from "@/services/system";
+import resourceUsageService from "@/services/resourceUsage.service";
 import { Spinner } from "../components/ui/spinner";
 import { Alert, AlertTitle, AlertDescription } from "../components/ui/alert";
 import {
@@ -15,6 +16,7 @@ import { UsersIcon, CheckCircleIcon, TrendingUpIcon, ClipboardListIcon, ArrowRig
 import type { User } from "@/types/user.types";
 import { UserRegistrationChart } from "@/components/dashboard/UserRegistrationChart";
 import { ActivityDistributionChart } from "@/components/dashboard/ActivityDistributionChart";
+import { UserResourceUsageChart } from "@/components/dashboard/UserResourceUsageChart";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -50,6 +52,21 @@ export default function DashboardPage() {
   } = useQuery<number>({
     queryKey: ["totalRevenue"],
     queryFn: () => systemService.getTotalRevenue(),
+  });
+
+  // Resource usage query
+  const {
+    data: resourceUsageData,
+    isLoading: resourceUsageLoading,
+    error: resourceUsageError,
+  } = useQuery({
+    queryKey: ["usersResourceUsage", users?.map(u => u.id)],
+    queryFn: async () => {
+      if (!users || users.length === 0) return [];
+      const userIds = users.map(u => u.id);
+      return resourceUsageService.getUsersResourceUsage(userIds);
+    },
+    enabled: !!users && users.length > 0,
   });
 
   if (usersLoading || profileLoading) {
@@ -212,6 +229,13 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <UserRegistrationChart users={users || []} />
         <ActivityDistributionChart activities={activities || []} />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        <UserResourceUsageChart 
+          resourceUsageData={resourceUsageData || []} 
+          isLoading={resourceUsageLoading}
+        />
       </div>
     </div>
   );
