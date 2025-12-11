@@ -1,4 +1,4 @@
-import { axiosPrivate } from './axios';
+import apiClient from '@/lib/apiClient';
 
 export interface TransactionItem {
   id: string;
@@ -9,7 +9,7 @@ export interface TransactionItem {
   status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
   provider?: string;
   providerTransactionId?: string;
-  metadata?: json;
+  metadata?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   user?: {
@@ -42,14 +42,12 @@ const transactionService = {
     status?: string;
     userId?: string;
   }): Promise<TransactionListResponse> => {
-    const response = await axiosPrivate.get('/payments/transactions', { params });
-    return response.data;
+    return apiClient.get<TransactionListResponse>('/payments/transactions', { params });
   },
 
   // Get single transaction detail
   getTransactionDetail: async (id: string): Promise<TransactionItem> => {
-    const response = await axiosPrivate.get(`/payments/transactions/${id}`);
-    return response.data;
+    return apiClient.get<TransactionItem>(`/payments/transactions/${id}`);
   },
 };
 

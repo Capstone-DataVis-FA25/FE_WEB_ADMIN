@@ -1,4 +1,4 @@
-import { axiosPrivate } from './axios';
+import apiClient from '@/lib/apiClient';
 
 export interface UserResourceUsage {
   usage: {
@@ -28,19 +28,46 @@ export interface UserResourceUsageWithId extends UserResourceUsage {
   userName?: string;
 }
 
+export interface TopUser {
+  userId: string;
+  userName: string;
+  email: string;
+  datasetsCount: number;
+  chartsCount: number;
+  totalResources: number;
+}
+
+export interface TimeSeriesDataPoint {
+  period: string;
+  date: string;
+  datasetsCount: number;
+  chartsCount: number;
+  totalResources: number;
+}
+
+export interface ResourceUsageOverTimeResponse {
+  period: 'day' | 'week' | 'month' | 'year';
+  startDate: string;
+  endDate: string;
+  topUsers: TopUser[];
+  timeSeriesData: TimeSeriesDataPoint[];
+  summary: {
+    totalDatasets: number;
+    totalCharts: number;
+    totalUsers: number;
+  };
+}
+
 const resourceUsageService = {
-  // Admin: Get user's resource usage by userId
   getUserResourceUsage: async (userId: string): Promise<UserResourceUsage> => {
-    const response = await axiosPrivate.get(`/users/${userId}/resource-usage`);
-    return response.data;
+    return await apiClient.get(`/users/${userId}/resource-usage`);
   },
 
   // Get resource usage for multiple users
   getUsersResourceUsage: async (userIds: string[]): Promise<UserResourceUsageWithId[]> => {
     const promises = userIds.map(async (userId) => {
       try {
-        const response = await axiosPrivate.get(`/users/${userId}/resource-usage`);
-        const usage = response.data;
+        const usage = await apiClient.get<UserResourceUsage>(`/users/${userId}/resource-usage`);
         return { ...usage, userId };
       } catch (error) {
         console.error(`Failed to fetch resource usage for user ${userId}:`, error);
@@ -50,6 +77,15 @@ const resourceUsageService = {
 
     const results = await Promise.all(promises);
     return results.filter((result): result is UserResourceUsageWithId => result !== null);
+  },
+
+  // Get resource usage statistics over time
+  getResourceUsageOverTime: async (
+    period: 'day' | 'week' | 'month' | 'year' = 'week'
+  ): Promise<ResourceUsageOverTimeResponse> => {
+    return apiClient.get<ResourceUsageOverTimeResponse>(
+      `/users/stats/resource-usage-over-time?period=${period}`
+    );
   },
 };
 

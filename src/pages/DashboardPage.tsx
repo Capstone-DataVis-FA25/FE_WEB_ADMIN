@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { userService } from "../services/user";
 import { systemService } from "@/services/system";
-import resourceUsageService from "@/services/resourceUsage.service";
 import { Spinner } from "../components/ui/spinner";
 import { Alert, AlertTitle, AlertDescription } from "../components/ui/alert";
 import {
@@ -12,7 +11,14 @@ import {
   CardContent,
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { UsersIcon, CheckCircleIcon, TrendingUpIcon, ClipboardListIcon, ArrowRight,DollarSign } from 'lucide-react';
+import {
+  UsersIcon,
+  CheckCircleIcon,
+  TrendingUpIcon,
+  ClipboardListIcon,
+  ArrowRight,
+  DollarSign,
+} from "lucide-react";
 import type { User } from "@/types/user.types";
 import { UserRegistrationChart } from "@/components/dashboard/UserRegistrationChart";
 import { ActivityDistributionChart } from "@/components/dashboard/ActivityDistributionChart";
@@ -52,21 +58,6 @@ export default function DashboardPage() {
   } = useQuery<number>({
     queryKey: ["totalRevenue"],
     queryFn: () => systemService.getTotalRevenue(),
-  });
-
-  // Resource usage query
-  const {
-    data: resourceUsageData,
-    isLoading: resourceUsageLoading,
-    error: resourceUsageError,
-  } = useQuery({
-    queryKey: ["usersResourceUsage", users?.map(u => u.id)],
-    queryFn: async () => {
-      if (!users || users.length === 0) return [];
-      const userIds = users.map(u => u.id);
-      return resourceUsageService.getUsersResourceUsage(userIds);
-    },
-    enabled: !!users && users.length > 0,
   });
 
   if (usersLoading || profileLoading) {
@@ -146,7 +137,7 @@ export default function DashboardPage() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold text-muted-foreground">
-                Total revenue 
+                Total revenue
               </CardTitle>
               <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg">
                 <DollarSign className="h-6 w-6 text-white" />
@@ -156,12 +147,17 @@ export default function DashboardPage() {
           <CardContent>
             <div className="flex items-baseline min-h-[40px]">
               {revenueLoading ? (
-                <span className="text-base text-muted-foreground">Đang tải...</span>
+                <span className="text-base text-muted-foreground">
+                  Đang tải...
+                </span>
               ) : revenueError ? (
                 <span className="text-base text-destructive">Lỗi</span>
               ) : (
                 <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                  {totalRevenue?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                  {totalRevenue?.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
                 </p>
               )}
             </div>
@@ -187,14 +183,12 @@ export default function DashboardPage() {
               <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                 {activities?.length || 0}
               </p>
-              <p className="ml-2 text-sm text-muted-foreground">
-                events
-              </p>
+              <p className="ml-2 text-sm text-muted-foreground">events</p>
             </div>
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               className="p-0 h-auto text-xs text-purple-600 dark:text-purple-400 mt-2 font-medium flex items-center gap-1"
-              onClick={() => navigate('/admin/activity')}
+              onClick={() => navigate("/admin/activity")}
             >
               View full feed <ArrowRight className="w-3 h-3" />
             </Button>
@@ -232,10 +226,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        <UserResourceUsageChart 
-          resourceUsageData={resourceUsageData || []} 
-          isLoading={resourceUsageLoading}
-        />
+        <UserResourceUsageChart />
       </div>
     </div>
   );

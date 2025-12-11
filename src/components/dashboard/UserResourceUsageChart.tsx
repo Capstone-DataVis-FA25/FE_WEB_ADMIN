@@ -1,4 +1,5 @@
-import { useMemo } from "react"
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Bar,
   BarChart,
@@ -8,70 +9,86 @@ import {
   XAxis,
   YAxis,
   Legend,
-} from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Database, BarChart3, Sparkles } from 'lucide-react'
-import type { UserResourceUsageWithId } from "@/services/resourceUsage.service"
+  Line,
+  ComposedChart,
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Database, BarChart3, TrendingUp, Users } from "lucide-react";
+import resourceUsageService, {
+  type ResourceUsageOverTimeResponse,
+} from "@/services/resourceUsage.service";
 
-interface UserResourceUsageChartProps {
-  resourceUsageData: UserResourceUsageWithId[]
-  isLoading?: boolean
-}
+const periodOptions = [
+  { value: "day", label: "Last 24 Hours" },
+  { value: "week", label: "Last 7 Days" },
+  { value: "month", label: "Last 30 Days" },
+  { value: "year", label: "Last 12 Months" },
+] as const;
 
-export function UserResourceUsageChart({ resourceUsageData, isLoading }: UserResourceUsageChartProps) {
+type Period = "day" | "week" | "month" | "year";
+
+export function UserResourceUsageChart() {
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>("week");
+
+  const {
+    data: resourceData,
+    isLoading,
+    error,
+  } = useQuery<ResourceUsageOverTimeResponse>({
+    queryKey: ["resourceUsageOverTime", selectedPeriod],
+    queryFn: () =>
+      resourceUsageService.getResourceUsageOverTime(selectedPeriod),
+    refetchInterval: 60000, // Refetch every minute
+  });
+
   const chartData = useMemo(() => {
-    if (!resourceUsageData || resourceUsageData.length === 0) return []
+    if (!resourceData?.timeSeriesData) return [];
+    return resourceData.timeSeriesData;
+  }, [resourceData]);
 
-    // Calculate aggregated statistics
-    const totalDatasets = resourceUsageData.reduce((sum, item) => sum + item.usage.datasetsCount, 0)
-    const totalCharts = resourceUsageData.reduce((sum, item) => sum + item.usage.chartsCount, 0)
-    const totalAIRequests = resourceUsageData.reduce((sum, item) => sum + item.usage.aiRequestsCount, 0)
-
-    const avgDatasets = totalDatasets / resourceUsageData.length
-    const avgCharts = totalCharts / resourceUsageData.length
-    const avgAIRequests = totalAIRequests / resourceUsageData.length
-
-    return [
-      {
-        name: "Datasets",
-        total: totalDatasets,
-        average: Math.round(avgDatasets * 100) / 100,
-        icon: Database,
-      },
-      {
-        name: "Charts",
-        total: totalCharts,
-        average: Math.round(avgCharts * 100) / 100,
-        icon: BarChart3,
-      },
-      {
-        name: "AI Requests",
-        total: totalAIRequests,
-        average: Math.round(avgAIRequests * 100) / 100,
-        icon: Sparkles,
-      },
-    ]
-  }, [resourceUsageData])
+  if (error) {
+    return (
+      <Card className="col-span-2 rounded-xl border border-red-200/50 shadow-lg bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+        <CardHeader className="pb-4 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-red-500 to-red-600 shadow-md">
+              <Database className="w-5 h-5 text-white" />
+            </div>
+            <CardTitle className="text-lg font-bold">
+              User Resource Usage Over Time
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6 flex items-center justify-center h-[400px]">
+          <p className="text-destructive">Failed to load resource usage data</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
       <Card className="col-span-2 rounded-xl border border-border shadow-lg bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
         <CardHeader className="pb-4 border-b border-border">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-md">
-              <Database className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-md">
+                <TrendingUp className="w-5 h-5 text-white" />
+              </div>
+              <CardTitle className="text-lg font-bold">
+                User Resource Usage Over Time
+              </CardTitle>
             </div>
-            <CardTitle className="text-lg font-bold">User Resource Usage</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="pt-6 flex items-center justify-center h-[300px]">
-          <p className="text-muted-foreground">Đang tải dữ liệu...</p>
+        <CardContent className="pt-6 flex items-center justify-center h-[400px]">
+          <p className="text-muted-foreground">Loading data...</p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
-  if (!resourceUsageData || resourceUsageData.length === 0) {
+  if (!resourceData || chartData.length === 0) {
     return (
       <Card className="col-span-2 rounded-xl border border-border shadow-lg bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
         <CardHeader className="pb-4 border-b border-border">
@@ -79,81 +96,185 @@ export function UserResourceUsageChart({ resourceUsageData, isLoading }: UserRes
             <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-md">
               <Database className="w-5 h-5 text-white" />
             </div>
-            <CardTitle className="text-lg font-bold">User Resource Usage</CardTitle>
+            <CardTitle className="text-lg font-bold">
+              User Resource Usage Over Time
+            </CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="pt-6 flex items-center justify-center h-[300px]">
-          <p className="text-muted-foreground">Không có dữ liệu</p>
+        <CardContent className="pt-6 flex items-center justify-center h-[400px]">
+          <p className="text-muted-foreground">No data available</p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
     <Card className="col-span-2 rounded-xl border border-border shadow-lg bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
       <CardHeader className="pb-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-md">
-            <Database className="w-5 h-5 text-white" />
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-md">
+              <TrendingUp className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-lg font-bold">
+                User Resource Usage Over Time
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                {resourceData.summary.totalDatasets} datasets,{" "}
+                {resourceData.summary.totalCharts} charts from{" "}
+                {resourceData.summary.totalUsers} users
+              </p>
+            </div>
           </div>
-          <CardTitle className="text-lg font-bold">User Resource Usage</CardTitle>
+
+          <div className="flex gap-2">
+            {periodOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setSelectedPeriod(option.value)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                  selectedPeriod === option.value
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-6 pl-0">
-        <div className="h-[300px] w-full">
+
+      <CardContent className="pt-6">
+        {/* Time Series Chart */}
+        <div className="h-[300px] w-full mb-6">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" opacity={0.1} />
-              <XAxis 
-                dataKey="name" 
+            <ComposedChart
+              data={chartData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#333"
+                opacity={0.1}
+              />
+              <XAxis
+                dataKey="period"
                 stroke="#888888"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
               />
-              <YAxis 
+              <YAxis
                 stroke="#888888"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
               />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'hsl(var(--card))', 
-                  borderColor: 'hsl(var(--border))', 
-                  borderRadius: '8px' 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "hsl(var(--card))",
+                  borderColor: "hsl(var(--border))",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                 }}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                labelStyle={{
+                  color: "hsl(var(--foreground))",
+                  fontWeight: "bold",
+                }}
                 formatter={(value: number, name: string) => {
-                  if (name === 'total') return [value.toLocaleString(), 'Tổng']
-                  if (name === 'average') return [value.toLocaleString(), 'Trung bình']
-                  return [value, name]
+                  const labels: Record<string, string> = {
+                    datasetsCount: "Datasets",
+                    chartsCount: "Charts",
+                    totalResources: "Total Resources",
+                  };
+                  return [value.toLocaleString(), labels[name] || name];
                 }}
               />
-              <Legend 
+              <Legend
                 formatter={(value) => {
-                  if (value === 'total') return 'Tổng'
-                  if (value === 'average') return 'Trung bình'
-                  return value
+                  const labels: Record<string, string> = {
+                    datasetsCount: "Datasets",
+                    chartsCount: "Charts",
+                    totalResources: "Total Resources",
+                  };
+                  return labels[value] || value;
                 }}
               />
-              <Bar 
-                dataKey="total" 
-                fill="#3b82f6" 
+              <Bar
+                dataKey="datasetsCount"
+                fill="#3b82f6"
                 radius={[8, 8, 0, 0]}
-                name="total"
+                name="datasetsCount"
               />
-              <Bar 
-                dataKey="average" 
-                fill="#10b981" 
+              <Bar
+                dataKey="chartsCount"
+                fill="#10b981"
                 radius={[8, 8, 0, 0]}
-                name="average"
+                name="chartsCount"
               />
-            </BarChart>
+              <Line
+                type="monotone"
+                dataKey="totalResources"
+                stroke="#f59e0b"
+                strokeWidth={2}
+                dot={{ fill: "#f59e0b", r: 4 }}
+                name="totalResources"
+              />
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Top Users Section */}
+        {resourceData.topUsers && resourceData.topUsers.length > 0 && (
+          <div className="border-t border-border pt-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Users className="w-4 h-4 text-muted-foreground" />
+              <h3 className="text-sm font-semibold">
+                Top Users by Resource Usage
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {resourceData.topUsers.slice(0, 6).map((user, index) => (
+                <div
+                  key={user.userId}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
+                >
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-xs font-bold text-primary">
+                      #{index + 1}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {user.userName}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {user.email}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-0.5">
+                    <div className="flex items-center gap-1">
+                      <Database className="w-3 h-3 text-blue-500" />
+                      <span className="text-xs font-medium">
+                        {user.datasetsCount}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <BarChart3 className="w-3 h-3 text-green-500" />
+                      <span className="text-xs font-medium">
+                        {user.chartsCount}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
-  )
+  );
 }
-
