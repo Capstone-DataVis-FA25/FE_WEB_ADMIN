@@ -73,9 +73,11 @@ export function ActivityDistributionChart({
                 paddingAngle={5}
                 dataKey="value"
               >
-                {chartData.map((_, index) => (
+                {chartData.map((entry, index) => (
                   <Cell
-                    key={`cell-${index}`}
+                    key={`cell-${index}-${String(
+                      (entry as any)?.name ?? index
+                    )}`}
                     fill={COLORS[index % COLORS.length]}
                   />
                 ))}
