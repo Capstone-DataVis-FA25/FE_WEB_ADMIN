@@ -21,6 +21,7 @@ import {
 import type { User } from "@/types/user.types";
 import { UserRegistrationChart } from "@/components/dashboard/UserRegistrationChart";
 import { ActivityDistributionChart } from "@/components/dashboard/ActivityDistributionChart";
+import { UserResourceUsageChart } from "@/components/dashboard/UserResourceUsageChart";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -221,6 +222,10 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <UserRegistrationChart users={users || []} />
         <ActivityDistributionChart activities={activities || []} />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        <UserResourceUsageChart />
       </div>
     </div>
   );

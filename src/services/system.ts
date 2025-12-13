@@ -15,7 +15,6 @@ export const systemService = {
      */
     getActivityLog: async (): Promise<Activity[]> => {
         const response = await apiClient.get<{ data: Activity[] }>('admin/activity?page=1&limit=30');
-        console.log("activity log: ", response);
         return response.data;
     },
     /**
@@ -34,18 +33,16 @@ export const systemService = {
         const response = await apiClient.get<{ revenueLast30Days: { date: string; revenue: number }[] }>(
             '/payments/revenue/last-30-days'
         );
+        // apiClient returns response.data.data which is { revenueLast30Days: [...] }
         return response.revenueLast30Days;
     },
     /**
      * Get admin payment transactions (paginated)
      */
     getAdminTransactions: async (page = 1, limit = 20): Promise<AdminTransactionPage> => {
-        const response = await apiClient.get<{
-            code: number;
-            message: string;
-            data: AdminTransactionPage;
-        }>(`${API_ENDPOINTS.ADMIN_TRANSACTIONS}?page=${page}&limit=${limit}`);
-        // Trả về đúng shape cho FE: { data, page, limit, total, totalPages }
-        return response.data;
+        // apiClient returns response.data.data directly
+        return apiClient.get<AdminTransactionPage>(
+            `${API_ENDPOINTS.ADMIN_TRANSACTIONS}?page=${page}&limit=${limit}`
+        );
     },
 };
