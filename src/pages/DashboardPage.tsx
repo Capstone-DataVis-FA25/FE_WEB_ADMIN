@@ -13,7 +13,6 @@ import {
 import { Button } from "../components/ui/button";
 import {
   UsersIcon,
-  CheckCircleIcon,
   TrendingUpIcon,
   ClipboardListIcon,
   ArrowRight,
