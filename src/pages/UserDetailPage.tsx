@@ -4,7 +4,19 @@ import { userService } from "@/services/user";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { ArrowLeft, Mail, Shield, CheckCircle2, XCircle, Lock, UserIcon, Activity, Clock, MapPin, AlertCircle } from 'lucide-react';
+import {
+  ArrowLeft,
+  Mail,
+  Shield,
+  CheckCircle2,
+  XCircle,
+  Lock,
+  UserIcon,
+  Activity,
+  Clock,
+  MapPin,
+  AlertCircle,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Role } from "@/types/role.enum";
 
@@ -12,7 +24,11 @@ export default function UserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { data: user, isLoading, error } = useQuery({
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["user", id],
     queryFn: () => userService.getUserById(id!),
     enabled: !!id,
@@ -22,7 +38,9 @@ export default function UserDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <Spinner size="lg" className="text-purple-600" />
-        <p className="mt-4 text-slate-500 font-medium animate-pulse">Loading user profile...</p>
+        <p className="mt-4 text-slate-500 font-medium animate-pulse">
+          Loading user profile...
+        </p>
       </div>
     );
   }
@@ -33,9 +51,12 @@ export default function UserDetailPage() {
         <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-full mb-4">
           <XCircle className="w-8 h-8 text-red-500" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">User Not Found</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          User Not Found
+        </h2>
         <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md">
-          The user profile you are looking for doesn't exist or has been removed.
+          The user profile you are looking for doesn't exist or has been
+          removed.
         </p>
         <Button onClick={() => navigate(-1)} variant="outline">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -49,9 +70,9 @@ export default function UserDetailPage() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header / Navigation */}
       <div className="flex items-center gap-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => navigate(-1)}
           className="hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
         >
@@ -78,7 +99,11 @@ export default function UserDetailPage() {
                   {(user.name || user.firstName || "?").charAt(0).toUpperCase()}
                 </div>
               </div>
-              <div className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-white dark:border-slate-800 ${user.isActive !== false ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+              <div
+                className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-white dark:border-slate-800 ${
+                  user.isActive !== false ? "bg-emerald-500" : "bg-red-500"
+                }`}
+              ></div>
             </div>
 
             {/* User Info */}
@@ -102,7 +127,7 @@ export default function UserDetailPage() {
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-3">
                   <Button variant="outline" className="shadow-sm">
                     <Lock className="w-4 h-4 mr-2" />
@@ -132,20 +157,36 @@ export default function UserDetailPage() {
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Full Name</label>
-                <p className="font-medium text-slate-900 dark:text-white text-lg">{user.name || user.firstName || "N/A"}</p>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Full Name
+                </label>
+                <p className="font-medium text-slate-900 dark:text-white text-lg">
+                  {user.name || user.firstName || "N/A"}
+                </p>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Email Address</label>
-                <p className="font-medium text-slate-900 dark:text-white text-lg">{user.email}</p>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Email Address
+                </label>
+                <p className="font-medium text-slate-900 dark:text-white text-lg">
+                  {user.email}
+                </p>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Role</label>
-                <p className="font-medium text-slate-900 dark:text-white text-lg capitalize">{(user.role ? String(user.role).toLowerCase() : "user")}</p>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Role
+                </label>
+                <p className="font-medium text-slate-900 dark:text-white text-lg capitalize">
+                  {user.role ? String(user.role).toLowerCase() : "user"}
+                </p>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">User ID</label>
-                <p className="font-mono text-sm text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded w-fit">{user.id}</p>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  User ID
+                </label>
+                <p className="font-mono text-sm text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded w-fit">
+                  {user.id}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -163,10 +204,16 @@ export default function UserDetailPage() {
                   <div key={i} className="relative pl-8">
                     <div className="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 bg-blue-500 shadow-sm z-10"></div>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                      <p className="font-medium text-slate-900 dark:text-white">Updated profile information</p>
-                      <span className="text-xs text-slate-500">2 hours ago</span>
+                      <p className="font-medium text-slate-900 dark:text-white">
+                        Updated profile information
+                      </p>
+                      <span className="text-xs text-slate-500">
+                        2 hours ago
+                      </span>
                     </div>
-                    <p className="text-sm text-slate-500 mt-1">Changed email address from old@example.com</p>
+                    <p className="text-sm text-slate-500 mt-1">
+                      Changed email address from old@example.com
+                    </p>
                   </div>
                 ))}
               </div>
@@ -186,32 +233,66 @@ export default function UserDetailPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${user.isActive !== false ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
-                    {user.isActive !== false ? <CheckCircle2 className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                  <div
+                    className={`p-2 rounded-full ${
+                      user.isActive !== false
+                        ? "bg-emerald-100 text-emerald-600"
+                        : "bg-red-100 text-red-600"
+                    }`}
+                  >
+                    {user.isActive !== false ? (
+                      <CheckCircle2 className="w-4 h-4" />
+                    ) : (
+                      <Lock className="w-4 h-4" />
+                    )}
                   </div>
                   <div>
                     <p className="font-medium text-sm">Account Status</p>
-                    <p className={`text-xs ${user.isActive !== false ? 'text-emerald-600' : 'text-red-600'}`}>
-                      {user.isActive !== false ? 'Active' : 'Locked'}
+                    <p
+                      className={`text-xs ${
+                        user.isActive !== false
+                          ? "text-emerald-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {user.isActive !== false ? "Active" : "Locked"}
                     </p>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm" className="text-xs">Change</Button>
+                <Button variant="ghost" size="sm" className="text-xs">
+                  Change
+                </Button>
               </div>
 
               <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
                 <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${user.isVerified ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'}`}>
-                      {user.isVerified ? <Shield className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">Verification</p>
-                      <p className={`text-xs ${user.isVerified ? 'text-blue-600' : 'text-amber-600'}`}>
-                        {user.isVerified ? 'Verified' : 'Pending'}
-                      </p>
-                    </div>
+                  <div
+                    className={`p-2 rounded-full ${
+                      user.isVerified
+                        ? "bg-blue-100 text-blue-600"
+                        : "bg-amber-100 text-amber-600"
+                    }`}
+                  >
+                    {user.isVerified ? (
+                      <Shield className="w-4 h-4" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4" />
+                    )}
                   </div>
-                <Button variant="ghost" size="sm" className="text-xs">Resend</Button>
+                  <div>
+                    <p className="font-medium text-sm">Verification</p>
+                    <p
+                      className={`text-xs ${
+                        user.isVerified ? "text-blue-600" : "text-amber-600"
+                      }`}
+                    >
+                      {user.isVerified ? "Verified" : "Pending"}
+                    </p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" className="text-xs">
+                  Resend
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -227,16 +308,22 @@ export default function UserDetailPage() {
               <div className="flex justify-between items-center border-b border-white/10 pb-3">
                 <span className="text-sm text-slate-400">Joined</span>
                 <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">
-                  {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
+                  {user.createdAt
+                    ? new Date(user.createdAt).toLocaleDateString()
+                    : "N/A"}
                 </span>
               </div>
               <div className="flex justify-between items-center border-b border-white/10 pb-3">
                 <span className="text-sm text-slate-400">Last Login</span>
-                <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">Just now</span>
+                <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">
+                  Just now
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-slate-400">Last Updated</span>
-                <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">2 days ago</span>
+                <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">
+                  2 days ago
+                </span>
               </div>
             </CardContent>
           </Card>

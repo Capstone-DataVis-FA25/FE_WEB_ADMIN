@@ -1,19 +1,22 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import * as Tabs from "@radix-ui/react-tabs";
 
-import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
-import * as Tabs from "@radix-ui/react-tabs"
-
-import { RevenueLast30DaysChart } from "@/components/dashboard/RevenueLast30DaysChart"
-import { systemService } from "@/services/system"
-import AdminTransactionFeed from "@/components/admin/AdminTransactionFeed"
+import { RevenueLast30DaysChart } from "@/components/dashboard/RevenueLast30DaysChart";
+import { systemService } from "@/services/system";
+import AdminTransactionFeed from "@/components/admin/AdminTransactionFeed";
 
 export default function RevenueChartPage() {
-  const [tab, setTab] = useState("transactions")
+  const [tab, setTab] = useState("transactions");
 
-  const { data: chartData, isLoading: chartLoading, error: chartError } = useQuery({
+  const {
+    data: chartData,
+    isLoading: chartLoading,
+    error: chartError,
+  } = useQuery({
     queryKey: ["revenueLast30Days"],
     queryFn: () => systemService.getRevenueLast30Days(),
-  })
+  });
 
   return (
     <Tabs.Root value={tab} onValueChange={setTab} className="space-y-6">
@@ -38,9 +41,13 @@ export default function RevenueChartPage() {
       </Tabs.Content>
       <Tabs.Content value="chart">
         <div className="max-h-[600px] overflow-y-auto">
-          <RevenueLast30DaysChart data={chartData} isLoading={chartLoading} error={chartError} />
+          <RevenueLast30DaysChart
+            data={chartData}
+            isLoading={chartLoading}
+            error={chartError}
+          />
         </div>
       </Tabs.Content>
     </Tabs.Root>
-  )
+  );
 }
