@@ -1,5 +1,6 @@
 import React from "react";
 import { Database, BarChart3, Sparkles } from "lucide-react";
+import { Badge } from "../ui/badge";
 
 interface UserResourceUsageBadgeProps {
   usage: {
