@@ -1,20 +1,26 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import type { CreateSubscriptionPlanDto, UpdateSubscriptionPlanDto, SubscriptionPlan } from "../../types"
-import { LabeledInput } from "@/components/ui/labeled-input"
-import { LabeledTextarea } from "@/components/ui/labeled-textarea"
-import { LabeledSwitch } from "@/components/ui/labeled-switch"
-import { LoadingButton } from "@/components/ui/loading-button"
-import { useToast } from "@/components/ui/toast"
-import { validateSubscriptionPlanForm } from "../../utils/form-validation"
+import type React from "react";
+import { useState, useEffect } from "react";
+import type {
+  CreateSubscriptionPlanDto,
+  UpdateSubscriptionPlanDto,
+  SubscriptionPlan,
+} from "../../types";
+import { LabeledInput } from "@/components/ui/labeled-input";
+import { LabeledTextarea } from "@/components/ui/labeled-textarea";
+import { LabeledSwitch } from "@/components/ui/labeled-switch";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { useToast } from "@/components/ui/toast";
+import { validateSubscriptionPlanForm } from "../../utils/form-validation";
 
 interface SubscriptionPlanFormProps {
-  plan?: SubscriptionPlan
-  onSubmit: (planData: CreateSubscriptionPlanDto | UpdateSubscriptionPlanDto) => Promise<void>
-  onCancel: () => void
-  isSubmitting?: boolean
+  plan?: SubscriptionPlan;
+  onSubmit: (
+    planData: CreateSubscriptionPlanDto | UpdateSubscriptionPlanDto
+  ) => Promise<void>;
+  onCancel: () => void;
+  isSubmitting?: boolean;
 }
 
 export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
@@ -23,44 +29,58 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
   onCancel,
   isSubmitting = false,
 }) => {
-  const [name, setName] = useState(plan?.name || "")
-  const [description, setDescription] = useState(plan?.description || "")
-  const [price, setPrice] = useState(plan?.price.toString() || "")
-  const [currency, setCurrency] = useState(plan?.currency || "VND")
-  const [interval, setInterval] = useState(plan?.interval || "month")
-  const [features, setFeatures] = useState(plan?.features?.join("\n") || "")
-  const [maxDatasets, setMaxDatasets] = useState(plan?.limits?.maxDatasets?.toString() || "")
-  const [maxCharts, setMaxCharts] = useState(plan?.limits?.maxCharts?.toString() || "")
-  const [maxFileSize, setMaxFileSize] = useState(plan?.limits?.maxFileSize?.toString() || "")
-  const [isActive, setIsActive] = useState(plan?.isActive ?? true)
+  const [name, setName] = useState(plan?.name || "");
+  const [description, setDescription] = useState(plan?.description || "");
+  const [price, setPrice] = useState(plan?.price.toString() || "");
+  const [currency, setCurrency] = useState(plan?.currency || "VND");
+  const [interval, setInterval] = useState(plan?.interval || "month");
+  const [features, setFeatures] = useState(plan?.features?.join("\n") || "");
+  const [maxDatasets, setMaxDatasets] = useState(
+    plan?.limits?.maxDatasets?.toString() || ""
+  );
+  const [maxCharts, setMaxCharts] = useState(
+    plan?.limits?.maxCharts?.toString() || ""
+  );
+  const [maxFileSize, setMaxFileSize] = useState(
+    plan?.limits?.maxFileSize?.toString() || ""
+  );
+  const [maxAiRequests, setMaxAiRequests] = useState(
+    plan?.limits?.maxAiRequests?.toString() || ""
+  );
+  const [isActive, setIsActive] = useState(plan?.isActive ?? true);
 
-  const [featureError, setFeatureError] = useState<string | null>(null)
-  const { toast } = useToast()
+  const [featureError, setFeatureError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (plan) {
-      setName(plan.name)
-      setDescription(plan.description || "")
-      setPrice(plan.price.toString())
-      setCurrency(plan.currency)
-      setInterval(plan.interval)
-      setFeatures(plan.features?.join("\n") || "")
-      setMaxDatasets(plan.limits?.maxDatasets?.toString() || "")
-      setMaxCharts(plan.limits?.maxCharts?.toString() || "")
-      setMaxFileSize(plan.limits?.maxFileSize?.toString() || "")
-      setIsActive(plan.isActive)
+      setName(plan.name);
+      setDescription(plan.description || "");
+      setPrice(plan.price.toString());
+      setCurrency(plan.currency);
+      setInterval(plan.interval);
+      setFeatures(plan.features?.join("\n") || "");
+      setMaxDatasets(plan.limits?.maxDatasets?.toString() || "");
+      setMaxCharts(plan.limits?.maxCharts?.toString() || "");
+      setMaxFileSize(plan.limits?.maxFileSize?.toString() || "");
+      setMaxAiRequests(plan.limits?.maxAiRequests?.toString() || "");
+      setIsActive(plan.isActive);
     }
-  }, [plan])
+  }, [plan]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!validateSubscriptionPlanForm({ name, price, maxDatasets, maxCharts, maxFileSize }, toast)) {
-      return
+    if (
+      !validateSubscriptionPlanForm(
+        { name, price, maxDatasets, maxCharts, maxFileSize, maxAiRequests },
+        toast
+      )
+    ) {
+      return;
     }
 
-    // clear any previous feature error
-    setFeatureError(null)
+    setFeatureError(null);
 
     try {
       const planData: CreateSubscriptionPlanDto | UpdateSubscriptionPlanDto = {
@@ -79,25 +99,28 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
           maxDatasets: maxDatasets ? Number.parseInt(maxDatasets) : undefined,
           maxCharts: maxCharts ? Number.parseInt(maxCharts) : undefined,
           maxFileSize: maxFileSize ? Number.parseInt(maxFileSize) : undefined,
+          maxAiRequests: maxAiRequests
+            ? Number.parseInt(maxAiRequests)
+            : undefined,
         },
         isActive: isActive,
-      }
+      };
 
-      await onSubmit(planData)
+      await onSubmit(planData);
     } catch (err) {
       toast({
         title: "Save failed",
         description: "Failed to save subscription plan. Please try again.",
         variant: "destructive",
-      })
-      console.error("Error saving plan:", err)
+      });
+      console.error("Error saving plan:", err);
     }
-  }
+  };
 
   const handleFeatureChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFeatures(e.target.value)
-    setFeatureError(null)
-  }
+    setFeatures(e.target.value);
+    setFeatureError(null);
+  };
 
   return (
     <div className="rounded-xl border border-border/50 shadow-lg bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm max-w-3xl mx-auto">
@@ -107,7 +130,9 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
             {plan ? "Edit Subscription Plan" : "Create New Subscription Plan"}
           </h3>
           <p className="text-muted-foreground">
-            {plan ? "Update the details of your subscription plan" : "Configure a new subscription plan for your users"}
+            {plan
+              ? "Update the details of your subscription plan"
+              : "Configure a new subscription plan for your users"}
           </p>
         </div>
 
@@ -118,7 +143,12 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
                 General Information
               </h4>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <LabeledInput label="Plan Name" value={name} onChange={(e) => setName(e.target.value)} required />
+                <LabeledInput
+                  label="Plan Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
                 <LabeledInput
                   label="Price"
                   type="number"
@@ -128,8 +158,16 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
                   onChange={(e) => setPrice(e.target.value)}
                   required
                 />
-                <LabeledInput label="Currency" value={currency} onChange={(e) => setCurrency(e.target.value)} />
-                <LabeledInput label="Interval" value={interval} onChange={(e) => setInterval(e.target.value)} />
+                <LabeledInput
+                  label="Currency"
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                />
+                <LabeledInput
+                  label="Interval"
+                  value={interval}
+                  onChange={(e) => setInterval(e.target.value)}
+                />
               </div>
             </div>
 
@@ -155,8 +193,10 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
             </div>
 
             <div className="pb-4 border-b border-border/50">
-              <h4 className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-4">Usage Limits</h4>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+              <h4 className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-4">
+                Usage Limits
+              </h4>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
                 <LabeledInput
                   label="Max Datasets"
                   type="number"
@@ -178,12 +218,25 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
                   value={maxFileSize}
                   onChange={(e) => setMaxFileSize(e.target.value)}
                 />
+                <LabeledInput
+                  label="Max AI Requests"
+                  type="number"
+                  min="0"
+                  value={maxAiRequests}
+                  onChange={(e) => setMaxAiRequests(e.target.value)}
+                />
               </div>
             </div>
 
             <div>
-              <h4 className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-4">Status</h4>
-              <LabeledSwitch checked={isActive} onCheckedChange={setIsActive} label="Active" />
+              <h4 className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-4">
+                Status
+              </h4>
+              <LabeledSwitch
+                checked={isActive}
+                onCheckedChange={setIsActive}
+                label="Active"
+              />
             </div>
           </div>
 
@@ -208,5 +261,5 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
