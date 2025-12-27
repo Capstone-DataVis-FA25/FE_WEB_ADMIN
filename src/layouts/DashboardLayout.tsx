@@ -79,11 +79,7 @@ const sidebarItems: SidebarItem[] = [
     href: "/admin/activity",
     icon: <Activity className="h-5 w-5" />,
   },
-  {
-    title: "System Status",
-    href: "/admin/system",
-    icon: <Syringe />,
-  },
+ 
   {
     title: "Subcription",
     href: "/admin/subscriptions",
