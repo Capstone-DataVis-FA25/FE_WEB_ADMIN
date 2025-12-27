@@ -128,8 +128,16 @@ export const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
                   onChange={(e) => setPrice(e.target.value)}
                   required
                 />
-                <LabeledInput label="Currency" value={currency} onChange={(e) => setCurrency(e.target.value)} />
-                <LabeledInput label="Interval" value={interval} onChange={(e) => setInterval(e.target.value)} />
+                <LabeledInput
+                  label="Currency"
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                />
+                {/* <LabeledInput
+                  label="Interval"
+                  value={interval}
+                  onChange={(e) => setInterval(e.target.value)}
+                /> */}
               </div>
             </div>
 

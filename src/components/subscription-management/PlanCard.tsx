@@ -1,11 +1,22 @@
 "use client"
 
-import type React from "react"
-import type { SubscriptionPlan } from "../../types"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { CheckCircle, Edit, Trash2 } from "lucide-react"
-import { formatPrice, formatInterval, formatDate } from "../../helpers/formatter"
+import type React from "react";
+import type { SubscriptionPlan } from "../../types";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, Edit, Trash2 } from "lucide-react";
+import {
+  formatPrice,
+  // formatInterval,
+  formatDate,
+} from "../../helpers/formatter";
 
 interface PlanCardProps {
   plan: SubscriptionPlan
@@ -45,7 +56,9 @@ export const PlanCard: React.FC<PlanCardProps> = ({ plan, onEdit, onDelete }) =>
             <span className="text-2xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               {formatPrice(plan.price, plan.currency)}
             </span>
-            <span className="text-xs font-semibold text-muted-foreground">{formatInterval(plan.interval)}</span>
+            <span className="text-xs font-semibold text-muted-foreground">
+              {/* {formatInterval(plan.interval)} */}
+            </span>
           </div>
         </div>
 
