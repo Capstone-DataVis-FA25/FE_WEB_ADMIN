@@ -4,6 +4,7 @@ export interface SubscriptionFormFields {
     maxDatasets?: string | number | null;
     maxCharts?: string | number | null;
     maxFileSize?: string | number | null;
+    maxAiRequests?: string | number | null;
 }
 
 export type ShowErrorFn = (args: {
@@ -17,7 +18,7 @@ export function validateSubscriptionPlanForm(
     fields: SubscriptionFormFields,
     showError: ShowErrorFn
 ): boolean {
-    const { name, price, maxDatasets, maxCharts, maxFileSize } = fields;
+    const { name, price, maxDatasets, maxCharts, maxFileSize, maxAiRequests } = fields;
 
     if (!name || !String(name).trim()) {
         showError({ title: 'Validation', description: 'Plan name is required', variant: 'destructive' });
@@ -50,6 +51,14 @@ export function validateSubscriptionPlanForm(
         const parsed = parseInt(String(maxFileSize), 10);
         if (Number.isNaN(parsed) || parsed <= 0) {
             showError({ title: 'Validation', description: 'Max file size must be a positive number', variant: 'destructive' });
+            return false;
+        }
+    }
+
+    if (maxAiRequests !== undefined && maxAiRequests !== null && String(maxAiRequests).trim() !== '') {
+        const parsed = parseInt(String(maxAiRequests), 10);
+        if (Number.isNaN(parsed) || parsed <= 0) {
+            showError({ title: 'Validation', description: 'Max AI requests must be a positive number', variant: 'destructive' });
             return false;
         }
     }
