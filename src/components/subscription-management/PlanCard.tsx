@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import type React from "react";
 import type { SubscriptionPlan } from "../../types";
@@ -19,12 +19,16 @@ import {
 } from "../../helpers/formatter";
 
 interface PlanCardProps {
-  plan: SubscriptionPlan
-  onEdit: (plan: SubscriptionPlan) => void
-  onDelete: (plan: SubscriptionPlan) => void
+  plan: SubscriptionPlan;
+  onEdit: (plan: SubscriptionPlan) => void;
+  onDelete: (plan: SubscriptionPlan) => void;
 }
 
-export const PlanCard: React.FC<PlanCardProps> = ({ plan, onEdit, onDelete }) => {
+export const PlanCard: React.FC<PlanCardProps> = ({
+  plan,
+  onEdit,
+  onDelete,
+}) => {
   return (
     <Card className="flex flex-col h-full rounded-xl border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm">
       <CardHeader className="pb-2 pt-4 px-4">
@@ -64,7 +68,9 @@ export const PlanCard: React.FC<PlanCardProps> = ({ plan, onEdit, onDelete }) =>
 
         {plan.features && plan.features.length > 0 && (
           <div>
-            <h4 className="font-bold text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Features</h4>
+            <h4 className="font-bold text-[10px] uppercase tracking-wide text-muted-foreground mb-2">
+              Features
+            </h4>
             <ul className="space-y-1.5">
               {plan.features.map((feature, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-xs">
@@ -80,12 +86,16 @@ export const PlanCard: React.FC<PlanCardProps> = ({ plan, onEdit, onDelete }) =>
 
         {plan.limits && (
           <div>
-            <h4 className="font-bold text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Limits</h4>
+            <h4 className="font-bold text-[10px] uppercase tracking-wide text-muted-foreground mb-2">
+              Limits
+            </h4>
             <div className="grid grid-cols-1 gap-2">
               {plan.limits.maxDatasets !== undefined && (
                 <div className="flex justify-between items-center p-2 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/10 border border-blue-200/30">
                   <span className="text-xs font-medium">Max Datasets</span>
-                  <span className="text-sm font-bold text-blue-600 dark:text-blue-400">{plan.limits.maxDatasets}</span>
+                  <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                    {plan.limits.maxDatasets}
+                  </span>
                 </div>
               )}
               {plan.limits.maxCharts !== undefined && (
@@ -101,6 +111,14 @@ export const PlanCard: React.FC<PlanCardProps> = ({ plan, onEdit, onDelete }) =>
                   <span className="text-xs font-medium">Max File Size</span>
                   <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
                     {plan.limits.maxFileSize}MB
+                  </span>
+                </div>
+              )}
+              {plan.limits.maxAiRequests !== undefined && (
+                <div className="flex justify-between items-center p-2 rounded-lg bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/10 border border-green-200/30">
+                  <span className="text-xs font-medium">Max AI Requests</span>
+                  <span className="text-sm font-bold text-green-600 dark:text-green-400">
+                    {plan.limits.maxAiRequests}
                   </span>
                 </div>
               )}
@@ -140,5 +158,5 @@ export const PlanCard: React.FC<PlanCardProps> = ({ plan, onEdit, onDelete }) =>
         </Button>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};

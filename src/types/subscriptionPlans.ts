@@ -2,6 +2,7 @@ export interface PlanLimits {
     maxDatasets?: number;
     maxCharts?: number;
     maxFileSize?: number;
+    maxAiRequests?: number;
 }
 
 export interface SubscriptionPlan {
